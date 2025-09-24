@@ -51,10 +51,10 @@ public sealed class Graphics
 
             if (position < image.Length && position > 0)
             {
-                image[position] = (byte)((color & 0xFF000000) >> 24);  
-                image[position + 1] = (byte)((color & 0x00FF0000) >> 16);  
-                image[position + 2] = (byte)((color & 0x0000FF00) >> 8);  
-                image[position + 3] = (byte)(color & 0x000000FF);  
+                image[position + 3] = (byte)((color & 0xFF000000) >> 24); // A
+                image[position + 0] = (byte)((color & 0x00FF0000) >> 16); //  R
+                image[position + 1] = (byte)((color & 0x0000FF00) >> 8);  // G
+                image[position + 2] = (byte)(color & 0x000000FF);  // B
             }
             
             // should we increment anyway??

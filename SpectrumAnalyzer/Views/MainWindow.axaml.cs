@@ -1,11 +1,9 @@
 using System;
 using System.Buffers;
-using System.Diagnostics;
 using System.Numerics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using SpectrumAnalyzer.Controls;
 using SpectrumAnalyzer.Utilities;
@@ -16,7 +14,6 @@ public partial class MainWindow : Window
 {
     private readonly DispatcherTimer _timer;
     private readonly WaterfallControl? _ctrl;
-    private double _time = 0;
     private double _timeDelta = 0.05;
     private const int SizeOfChunk = 4096;
     private const int NumberOfDisplayPoint = 512;
@@ -45,7 +42,6 @@ public partial class MainWindow : Window
 
     private void HandleDispatcherTimerCallback(object? sender, EventArgs e)
     {
-        _time += _timeDelta;
         _displayPointsPool.Span.Clear();
         
         FillRandomData();
@@ -68,7 +64,24 @@ public partial class MainWindow : Window
            pointsSpan[i] = new Point(scaledPt.Item1,  scaledPt.Item2);
         }
         
-        _graphUtils.DrawLines(_bitmapDataPool.Span, pointsSpan, Color.FromArgb(128, 255, 0, 0));
+        _graphUtils.DrawLines(_bitmapDataPool.Span, pointsSpan, Color.FromArgb(255, 255, 128,0));
+        
+        
+        var framePool = ArrayPool<Point>.Shared.Rent(5);
+        
+        var frameSpan = new Span<Point>(framePool, 0, 5)
+        {
+            [0] = new Point(0, 0),
+            [1] = new Point(_ctrl.WidthPx - 1, 0),
+            [2] = new Point(_ctrl.WidthPx - 1, _ctrl.HeightPx - 1),
+            [3] = new Point(0, _ctrl.HeightPx - 1),
+            [4] = new Point(0, 0),
+        };
+
+        _graphUtils.DrawLines(_bitmapDataPool.Span, frameSpan, Color.FromArgb(240, 255, 255, 40));
+        
+        ArrayPool<Point>.Shared.Return(framePool);
+        
         _ctrl.UpdateData(_bitmapDataPool.Span);
         _bitmapDataPool.Span.Clear();
         ArrayPool<Point>.Shared.Return(pointsPool);
