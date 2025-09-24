@@ -1,18 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 
 namespace SpectrumAnalyzer.Services;
 
-public interface IDataReceived
+public sealed class DataReceivedEventArgs(int Size, long TimeStamp) : EventArgs
 {
-    event EventHandler<EventArgs> DataReceived;
+    public int Size { get; } = Size;
+    public long TimeStamp { get; } = TimeStamp;
+}
+
+public interface IDataReceived<T> where T : EventArgs
+{
+    event EventHandler<DataReceivedEventArgs> DataReceived;
 }
 
 //I wish I could use some fancy AsyncEnumerator, but i think, i would be
 // diffictul to control the memory pools/ 
 
-public interface ITransport<T> : IDataReceived, IDisposable
+public interface ITransport<T> 
+    : IDataReceived<DataReceivedEventArgs>, IDisposable
 {
     /// <summary>
     /// Gets or sets the size of the single received data frame size.
@@ -37,11 +42,11 @@ public interface ITransport<T> : IDataReceived, IDisposable
     ReadOnlySpan<T> GetRawData();
 }
 
-public class IUsprTransport<TData> : ITransport<TData> where TData : struct
+public class IUHDTransport<TData> : ITransport<TData> where TData : struct
 {
     private readonly IDeviceNativeApi<float> _api;
 
-    public IUsprTransport(IDeviceNativeApi<float> api)
+    public IUHDTransport(IDeviceNativeApi<float> api)
     {
         _api = api;
     }
@@ -51,7 +56,7 @@ public class IUsprTransport<TData> : ITransport<TData> where TData : struct
         // TODO release managed resources here
     }
 
-    public event EventHandler<EventArgs>? DataReceived;
+    public event EventHandler<DataReceivedEventArgs>? DataReceived;
     public uint InternalPoolChunkSize { get; set; }
     public uint InternalPoolChunkNumber { get; }
     public uint InternalPoolChunkNumberMax { get; set; }
