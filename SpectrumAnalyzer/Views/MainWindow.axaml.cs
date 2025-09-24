@@ -77,9 +77,9 @@ public partial class MainWindow : Window
     
     private void FillRandomData()
     {
-        double delta = _timeDelta / SizeOfChunk;
+        var delta = _timeDelta / SizeOfChunk;
         double accumulated = 0;
-        for (int i = 0; i < _spectrumPool.Span.Length; i++)
+        for (var i = 0; i < _spectrumPool.Span.Length; i++)
         {
             _spectrumPool.Span[i] = (Random.Shared.NextSingle()) - 1;
             accumulated+=delta;
@@ -87,33 +87,3 @@ public partial class MainWindow : Window
     }
 }
 
-public static class WriteableBitmapFill
-{
-    public static unsafe void FillSolid(this WriteableBitmap bmp, Color color)
-    {
-        using var fb = bmp.Lock(); // ILockedFramebuffer
-
-        int w = fb.Size.Width;
-        int h = fb.Size.Height;
-        int rowBytes = fb.RowBytes;
-
-        // Premultiply for AlphaFormat.Premul
-        byte a = color.A;
-        byte r = (byte)(color.R * a / 255);
-        byte g = (byte)(color.G * a / 255);
-        byte b = (byte)(color.B * a / 255);
-
-        // Memory order: B G R A
-        uint packed = (uint)(b | (g << 8) | (r << 16) | (a << 24));
-
-        for (int y = 0; y < h; y++)
-        {
-            // Start of this scanline
-            uint* row = (uint*)((byte*)fb.Address + y * rowBytes);
-
-            // Fill only the pixel area (ignore padding at end of row)
-            for (int x = 0; x < w; x++)
-                row[x] = packed;
-        }
-    }
-}

@@ -34,7 +34,7 @@ public class WaterfallControl : Control
         var dst = new Span<byte>((void*)fb.Address, fb.RowBytes * fb.Size.Height);
         
 
-        int srcStride = WidthPx * 4;
+        var srcStride = WidthPx * 4;
         if (fb.RowBytes == srcStride)
         {
             bgra.CopyTo(dst);
@@ -42,7 +42,7 @@ public class WaterfallControl : Control
         else
         {
             // handle padded rowbytes
-            for (int y = 0; y < HeightPx; y++)
+            for (var y = 0; y < HeightPx; y++)
             {
                 bgra.Slice(y * srcStride, srcStride)
                     .CopyTo(dst.Slice(y * fb.RowBytes, srcStride));
