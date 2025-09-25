@@ -37,6 +37,8 @@ public class StreamingDataPool : IStreamingDataPool<float>
         return _queue.TryPeek(out var buffer) ? buffer.Length : 0;
     }
 
+    public int RequestedDataLength { get; }
+
     public bool RequestLatest(Span<float> buffer)
     {
         if (!_queue.TryDequeue(out var data))

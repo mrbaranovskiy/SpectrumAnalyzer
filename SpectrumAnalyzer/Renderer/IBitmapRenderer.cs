@@ -17,8 +17,9 @@ public interface IStreamingDataPool<TData>
         IDisposable where TData : struct
 {
     bool IsAvailable { get; }
-    bool RequestLatest(Span<float> buffer);
+    bool RequestLatest(Span<TData> buffer);
     int RequestLatestDataLength();
+    int RequestedDataLength { get; }
 }
 
 
