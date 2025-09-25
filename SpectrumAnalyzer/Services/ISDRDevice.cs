@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using SpectrumAnalyzer.Services.Native;
 
 namespace SpectrumAnalyzer.Services;
 

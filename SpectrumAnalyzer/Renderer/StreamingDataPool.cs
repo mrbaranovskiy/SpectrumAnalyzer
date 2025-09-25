@@ -5,14 +5,14 @@ using SpectrumAnalyzer.Services;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public class StreamingDataPool : IStreamingDataPool<float>, IDataReceived<DataReceivedEventArgs>
+public class StreamingDataPool : IStreamingDataPool<float>
 {
     private readonly ITransport<float> _transport;
     private readonly ArrayPool<float> _pool;
     private ulong _chunkId = 0; //forever  and ever.
     private ConcurrentQueue<float[]> _queue;
 
-    public StreamingDataPool(ITransport<float>  transport)
+    public StreamingDataPool(ITransport<float> transport)
     {
         _pool = ArrayPool<float>.Create(1024*1024*10, 1024*10);
         _transport = transport;
@@ -21,6 +21,8 @@ public class StreamingDataPool : IStreamingDataPool<float>, IDataReceived<DataRe
 
     private void TransportOnDataReceived(object? sender, EventArgs e)
     {
+        // delete this bliat`. No sense to read faster in transport than process in
+        // Streaming pool. 
         var data = _transport.GetRawData();
         var buffer = _pool.Rent(data.Length);
         _queue.Enqueue(buffer);

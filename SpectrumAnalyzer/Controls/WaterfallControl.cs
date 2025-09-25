@@ -9,6 +9,8 @@ namespace SpectrumAnalyzer.Controls;
 
 public class WaterfallControl : Control
 {
+    
+    
     public WriteableBitmap Bitmap { get; }
     public int WidthPx  { get; }
     public int HeightPx { get; }
