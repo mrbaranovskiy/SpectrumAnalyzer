@@ -66,7 +66,7 @@ public class UHDTransport : ITransport<Complex>
                 OnDataReceived(new DataReceivedEventArgs(1024, DateTime.UtcNow.ToFileTimeUtc()));
             }
             
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            Thread.Sleep(TimeSpan.FromMilliseconds(1000));
         }
     }
     
