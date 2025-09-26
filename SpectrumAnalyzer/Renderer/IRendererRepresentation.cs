@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Buffers;
 using System.Numerics;
-using System.Threading.Tasks;
 using Avalonia.Media;
-using DynamicData;
-using FftSharp.Windows;
 using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Renderer;
 
 // time/fft/waterfall
-public interface IRendererRepresentation<TDrawingProperties, TData> : IDisposable
+public interface IRendererRepresentation : IDisposable
 {
     /// <summary>
     /// Builds the representation
@@ -21,7 +18,7 @@ public interface IRendererRepresentation<TDrawingProperties, TData> : IDisposabl
 }
 
 public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
-    : IRendererRepresentation<TDrawingProperties, TData> where TData : struct
+    : IRendererRepresentation where TData : struct
 {
     private protected readonly IStreamingDataPool<TData> _dataPool;
     private protected ArrayPool<byte> _arrayPool;

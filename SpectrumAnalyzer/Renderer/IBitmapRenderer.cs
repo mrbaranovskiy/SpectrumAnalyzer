@@ -7,8 +7,7 @@ namespace SpectrumAnalyzer.Renderer;
 //інакше кожен буде забирати свій чанк
 public interface IBitmapRenderer<TData>  where TData : struct
 {
-    void UpdateData(ReadOnlySpan<TData> data);
-    void AddRepresentation();
+    void AddRepresentation(IRendererRepresentation representation);
     void Render();
 }
 

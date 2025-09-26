@@ -13,7 +13,6 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
 
     public FftRepresentation(IStreamingDataPool<Complex> dataPool) : base(dataPool)
     {
-        
         _graphics = Graphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
         
         var windowSize = DrawingProperties.Height * DrawingProperties.Width * 4;

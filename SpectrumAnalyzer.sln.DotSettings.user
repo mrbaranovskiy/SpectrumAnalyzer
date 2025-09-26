@@ -36,6 +36,7 @@
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.SignalUtilitiesTest.TestInterpolation&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.SignalUtilitiesTest.TestSignalGenerator&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.Services.TransportTests.TestUHDTransportGivesValues&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.Services.StreamingPoolTests.TestStreamingDataPool&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d3df603a_002Dd118_002D4b1f_002Da45e_002Dec0f27707f42/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestMethod1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;

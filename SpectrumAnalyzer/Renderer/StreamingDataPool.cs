@@ -11,13 +11,14 @@ public class StreamingDataPool : IStreamingDataPool<Complex>
     private readonly ITransport<Complex> _transport;
     private readonly ArrayPool<Complex> _pool;
     private ulong _chunkId = 0; //forever  and ever.
-    private ConcurrentQueue<Complex[]> _queue;
+    private readonly ConcurrentQueue<Complex[]> _queue;
 
     public StreamingDataPool(ITransport<Complex> transport)
     {
         _pool = ArrayPool<Complex>.Create(1024*1024*10, 1024*10);
         _transport = transport;
         _transport.DataReceived += TransportOnDataReceived;
+        _queue = new ConcurrentQueue<Complex[]>();
     }
 
     private void TransportOnDataReceived(object? sender, EventArgs e)
