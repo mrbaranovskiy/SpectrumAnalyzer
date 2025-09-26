@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Concurrent;
+using System.Numerics;
 using SpectrumAnalyzer.Services;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public class StreamingDataPool : IStreamingDataPool<float>
+public class StreamingDataPool : IStreamingDataPool<Complex>
 {
-    private readonly ITransport<float> _transport;
-    private readonly ArrayPool<float> _pool;
+    private readonly ITransport<Complex> _transport;
+    private readonly ArrayPool<Complex> _pool;
     private ulong _chunkId = 0; //forever  and ever.
-    private ConcurrentQueue<float[]> _queue;
+    private ConcurrentQueue<Complex[]> _queue;
 
-    public StreamingDataPool(ITransport<float> transport)
+    public StreamingDataPool(ITransport<Complex> transport)
     {
-        _pool = ArrayPool<float>.Create(1024*1024*10, 1024*10);
+        _pool = ArrayPool<Complex>.Create(1024*1024*10, 1024*10);
         _transport = transport;
         _transport.DataReceived += TransportOnDataReceived;
     }
@@ -39,7 +40,7 @@ public class StreamingDataPool : IStreamingDataPool<float>
 
     public int RequestedDataLength { get; }
 
-    public bool RequestLatest(Span<float> buffer)
+    public bool RequestLatest(Span<Complex> buffer)
     {
         if (!_queue.TryDequeue(out var data))
             return false;

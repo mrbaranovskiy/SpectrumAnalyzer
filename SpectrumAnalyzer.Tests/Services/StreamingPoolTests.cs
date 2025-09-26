@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System.Numerics;
+using Moq;
 using SpectrumAnalyzer.Renderer;
 using SpectrumAnalyzer.Services;
 using SpectrumAnalyzer.Services.Native;
@@ -12,7 +13,7 @@ public class StreamingPoolTests
     public void TestStreamingDataPool()
     {
         var moq = new Mock<IDeviceNativeApi<float>>();
-        ITransport<float> transport = new UHDTransport(moq.Object);
+        ITransport<Complex> transport = new UHDTransport(moq.Object);
         var sdp = new StreamingDataPool(transport);
     }
 }
