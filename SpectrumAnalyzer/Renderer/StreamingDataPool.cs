@@ -41,7 +41,7 @@ public class StreamingDataPool : IStreamingDataPool<Complex>
 
     public int RequestedDataLength { get; }
 
-    public bool RequestLatest(Span<Complex> buffer)
+    public bool RequestLatestCopy(Span<Complex> buffer)
     {
         if (!_queue.TryDequeue(out var data))
             return false;
@@ -54,7 +54,24 @@ public class StreamingDataPool : IStreamingDataPool<Complex>
 
         return false;
     }
-    
+
+    /// <summary>
+    /// Peeks but doesnt delete the data from queue.
+    /// </summary>
+    /// <returns>Returns empty if no data.</returns>
+    public ReadOnlySpan<Complex> PeekLatestData()
+    {
+        return !_queue.TryPeek(out var data) 
+            ? ReadOnlySpan<Complex>.Empty 
+            : data;
+    }
+
+    public void ReleaseLatestData()
+    {
+        if (_queue.TryDequeue(out var buffer))
+            _pool.Return(buffer);
+    }
+
     public void Dispose()
     {
         while (!_queue.IsEmpty)
