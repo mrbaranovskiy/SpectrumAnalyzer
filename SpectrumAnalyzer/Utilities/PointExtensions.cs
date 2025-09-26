@@ -14,3 +14,24 @@ public static class PointExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int PosInBuffer(this Point point, int w, int h) => (w * (int)point.Y + (int)point.X) * 4;
 }
+
+
+public struct AxisRange
+{
+    public double Min { get; }
+    public double Max { get; }
+
+    public AxisRange(double min, double max)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(min, max);
+        
+        Min = min;
+        Max = max;
+    }
+    
+    /// <summary>
+    /// Returns power in watts.
+    /// </summary>
+    /// <param name="magnitudeInDb"></param>
+    public static double FromDecibels(double magnitudeInDb) => Math.Pow(10, magnitudeInDb / 10);
+}

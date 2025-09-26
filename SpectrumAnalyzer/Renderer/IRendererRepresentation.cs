@@ -24,10 +24,10 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
     : IRendererRepresentation<TDrawingProperties, TData> where TData : struct
 {
     private protected readonly IStreamingDataPool<TData> _dataPool;
-    private protected ArrayPool<TData> _arrayPool;
-    private protected Memory<TData> _screenMemoryHandle;
+    private protected ArrayPool<byte> _arrayPool;
+    private protected Memory<byte> _bitmapMemoryHandle;
     private protected Memory<TData> _signalMemoryHandle;
-    private protected TData[] _screenBuffer;
+    private protected byte[] _screenBuffer;
     private protected TData[] _signalBuffer;
     private TDrawingProperties _drawingProperties;
 
@@ -50,7 +50,7 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
 
     public abstract ReadOnlySpan<byte> BuildRepresentation();
 
-    public abstract void HandleDrawingPropertiesUpdated();
+    protected abstract void HandleDrawingPropertiesUpdated();
 
     public virtual void Dispose()
     {
@@ -59,57 +59,19 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
     }
 }
 
+//todo: it is to complicated. convert to class an add checks.
 public record FFTRepresentationProperties(
     int Width,
     int Height,
-    double MinFrequency,
-    double MaxFrequency,
+    double Bandwidth,
     double CenterFrequency,
-    double SamplingRate)
-{
-    private readonly int _width = Width;
-    private readonly int _height = Height;
-    private readonly double _minFrequency = MinFrequency;
-    private readonly double _maxFrequency = MaxFrequency;
-    private readonly double _centerFrequency = CenterFrequency;
-    private readonly double _samplingRate = SamplingRate;
+    double SamplingRate,
+    AxisRange XAxisRange,
+    AxisRange YAxisRange,
+    double XScaleFrequency, // zoom in to frequency.
+    double XScale = 1.0, //todo: change it to something [0.1 .. 1.0]
+    double YScale = 1.0);
 
-    public int Width
-    {
-        get => _width;
-        init => _width = value;
-    }
-
-    public int Height
-    {
-        get => _height;
-        init => _height = value;
-    }
-
-    public double MinFrequency
-    {
-        get => _minFrequency;
-        init => _minFrequency = value;
-    }
-
-    public double MaxFrequency
-    {
-        get => _maxFrequency;
-        init => _maxFrequency = value;
-    }
-
-    public double CenterFrequency
-    {
-        get => _centerFrequency;
-        init => _centerFrequency = value;
-    }
-
-    public double SamplingRate
-    {
-        get => _samplingRate;
-        init => _samplingRate = value;
-    }
-}
 
 public record WaterfallColorLookup(Color Min,  Color Max)
 {
@@ -128,78 +90,6 @@ public record WaterfallColorLookup(Color Min,  Color Max)
         init => _max = value;
     }
 }
-
-public class FFTRepresentation : RendererRepresentationAbstract<FFTRepresentationProperties, Complex>
-{
-    private readonly Graphics _graphics;
-
-    public FFTRepresentation(IStreamingDataPool<Complex> dataPool) : base(dataPool)
-    {
-        
-        _graphics = Graphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
-        
-        var windowSize = (int)(DrawingProperties.Height * DrawingProperties.Width * 4);
-        
-        _arrayPool = ArrayPool<Complex>.Create(windowSize, 1);
-        _screenBuffer = _arrayPool.Rent(windowSize);
-        _screenMemoryHandle = new Memory<Complex>(_screenBuffer, 0, windowSize);
-        _signalBuffer = ArrayPool<Complex>.Shared.Rent(dataPool.RequestedDataLength);
-        _signalMemoryHandle = new Memory<Complex>(_signalBuffer, 0, windowSize);
-    }
-
-    public override ReadOnlySpan<byte> BuildRepresentation()
-    {
-        _dataPool.RequestLatest(_signalMemoryHandle.Span);
-        // FftSharp.Windows.Rectangular rw = new Rectangular();
-        FftSharp.FFT.Forward(_signalMemoryHandle.Span);
-        // todo: GC intensive code. Need to reimplement this.
-        var power = FftSharp.FFT.Power(_screenBuffer);
-        var freq = FftSharp.FFT.FrequencyScale(power.Length, DrawingProperties.SamplingRate);
-
-        // cut only needed frequencies, because we can zoon in/out on the screen.
-
-        var min = (int)DrawingProperties.MinFrequency;
-        var max = (int)DrawingProperties.MaxFrequency;
-        var imin = 0;
-        var imax = 0;
-        
-        //??? check it...
-        for (int i = 0; i < freq.Length; i++)
-        {
-            if (freq[i] < min) 
-                continue;
-            
-            imin = Math.Max(i - 1, 0);
-            break;
-        }
-
-        for (int i = freq.Length - 1; i >= 0; i--)
-        {
-           if(freq[i] > max)
-               continue;
-           imax = Math.Min(i + 1, freq.Length - 1);
-        }
-        
-        // this cut spectrum
-        var powerSpan = new Span<double>(power, imin, imax);
-                
-        
-
-        // not fit the data to the screen.
-
-    }
-
-    public override void HandleDrawingPropertiesUpdated()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void Dispose()
-    {
-        throw new NotImplementedException();
-    }
-}
-
 
 public record WaterfallRepresentationProperties(
     double Width,
@@ -260,6 +150,11 @@ public class WaterfallRepresentation : RendererRepresentationAbstract<WaterfallR
     }
 
     public override ReadOnlySpan<byte> BuildRepresentation()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void HandleDrawingPropertiesUpdated()
     {
         throw new NotImplementedException();
     }
