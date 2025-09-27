@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Buffers;
-using System.Linq;
 using System.Numerics;
 using Avalonia;
 using SpectrumAnalyzer.Utilities;
-using Vector = System.Numerics.Vector;
-
-using System;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-using Bitmap = System.Drawing.Bitmap;
-using Color = System.Drawing.Color;
-using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 
 namespace SpectrumAnalyzer.Renderer;
@@ -45,34 +36,6 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         // todo: GC intensive code. Need to reimplement this.
         var power = FftSharp.FFT.Power(_signalBuffer);
         var freq = FftSharp.FFT.FrequencyScale(power.Length, DrawingProperties.SamplingRate);
-
-        // cut only needed frequencies, because we can zoon in/out on the screen.
-
-        // var min = -(int)DrawingProperties.Bandwidth / 2;
-        // var max = (int)DrawingProperties.Bandwidth / 2;
-        // var imin = 0;
-        // var imax = 0;
-        //
-        // //??? check it...
-        // for (int i = 0; i < freq.Length; i++)
-        // {
-        //     if (freq[i] < min) 
-        //         continue;
-        //     
-        //     imin = Math.Max(i - 1, 0);
-        //     break;
-        // }
-        //
-        // for (int i = freq.Length - 1; i >= 0; i--)
-        // {
-        //    if(freq[i] > max)
-        //        continue;
-        //    imax = Math.Min(i + 1, freq.Length - 1);
-        // }
-        
-        // this cut spectrum
-        //var powerSpan = new Span<double>(power, imin, imax);
-
 
         var wndSize = DrawingProperties.Height * DrawingProperties.Width * 4;
         var screenPoints = ArrayPool<Point>.Shared.Rent(wndSize);
@@ -107,20 +70,18 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         ArrayPool<Point>.Shared.Return(screenPoints); 
         ArrayPool<double>.Shared.Return(resampledPower);
         ArrayPool<double>.Shared.Return(resampledFreq);
-
-        //return _bitmapMemoryHandle.Span;
     }
     
-    public void UpdateData(Bitmap bitmap, ReadOnlySpan<Point> pixels) // length = w*h*4 (premul)
-    {
-        for (int i = 0; i < pixels.Length; i++)
-        {
-            if (pixels[i].X < 0 || pixels[i].X >= bitmap.Width || pixels[i].Y < 0 || pixels[i].Y >= bitmap.Height)
-                continue;
-            
-            bitmap.SetPixel((int)pixels[i].X, (int)pixels[i].Y, Color.Blue);
-        }        
-    }
+    // public void UpdateData(Bitmap bitmap, ReadOnlySpan<Point> pixels) // length = w*h*4 (premul)
+    // {
+    //     for (int i = 0; i < pixels.Length; i++)
+    //     {
+    //         if (pixels[i].X < 0 || pixels[i].X >= bitmap.Width || pixels[i].Y < 0 || pixels[i].Y >= bitmap.Height)
+    //             continue;
+    //         
+    //         bitmap.SetPixel((int)pixels[i].X, (int)pixels[i].Y, Color.Blue);
+    //     }        
+    // }
 
     public override ReadOnlySpan<byte> CurrentFrame => _bitmapMemoryHandle.Span;
 
@@ -150,6 +111,6 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
 
     public override void Dispose()
     {
-        throw new NotImplementedException();
+        
     }
 }
