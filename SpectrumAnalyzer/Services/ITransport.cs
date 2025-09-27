@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace SpectrumAnalyzer.Services;
 
@@ -20,10 +21,11 @@ public interface ITransport<T>
     : IDataReceived<DataReceivedEventArgs>, IDisposable
 {
     bool IsStreaming { get; }
-
     DateTime LastDataReceived { get; }
     ReadOnlySpan<T> GetRawData();
     int ReceivingChunkSize { get; set; }
+    Task Start();
+    Task Stop();
 }
 
 // var device = Device.UHD.GetDevice();

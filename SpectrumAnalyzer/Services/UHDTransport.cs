@@ -11,7 +11,7 @@ namespace SpectrumAnalyzer.Services;
 public class UHDTransport : ITransport<Complex>
 {
     private readonly IDeviceNativeApi<float> _api;
-    private readonly Task _readTask;
+    private Task _readTask;
     private readonly CancellationTokenSource _cts = new();
     private ArrayPool<Complex> _pool;
     private Memory<Complex> _memory;
@@ -29,7 +29,7 @@ public class UHDTransport : ITransport<Complex>
         _buffer = _pool.Rent(ReceivingChunkSize);
         _memory = new Memory<Complex>(_buffer, 0, ReceivingChunkSize);
         // todo: not the best idea.... do some start function.. 
-        _readTask = Task.Run(ReadingLoop);
+        
     }
 
     public bool IsStreaming => _readTask.Status == TaskStatus.Running;
@@ -52,6 +52,17 @@ public class UHDTransport : ITransport<Complex>
             _receivingChunkSize = value;
             ResetPools();
         }
+    }
+
+    public Task Start()
+    {
+        _readTask = Task.Run(ReadingLoop);
+        return _readTask;
+    }
+
+    public Task Stop()
+    {
+        return _cts.CancelAsync();
     }
 
     protected virtual void OnDataReceived(DataReceivedEventArgs e)
@@ -81,10 +92,6 @@ public class UHDTransport : ITransport<Complex>
                 // data can be lost. 
                 /// todo: some prebuffereing.
                 /// 
-                // SignalGenerator.GenerateRandomIQ(_memory.Span, center_fr: 10e3, sampling_rate: 32e3,
-                //     (5e3, 4), 
-                //     (10e3, 2)
-                // );
 
                 var temp = new double[_memory.Span.Length];
 

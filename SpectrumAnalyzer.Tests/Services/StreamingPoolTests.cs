@@ -27,9 +27,9 @@ public class StreamingPoolTests
         var props = new FFTRepresentationProperties(
             Width: 1000,
             Height: 300,
-            Bandwidth: 10e3,
-            CenterFrequency: 10e3,
-            SamplingRate: 32e3,
+            Bandwidth: 10000,
+            CenterFrequency: 10000,
+            SamplingRate: 32000,
             XAxisRange: new AxisRange(1, 16000),
             YAxisRange: new AxisRange(-400, 60),
             XScaleFrequency: 10e3

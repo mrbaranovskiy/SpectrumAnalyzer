@@ -26,8 +26,18 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         _signalMemoryHandle = new Memory<Complex>(_signalBuffer, 0, singleBufferLength);
     }
 
+    public override void UpdateDrawingProperties(FFTRepresentationProperties properties)
+    {
+        
+    }
+
     public override void BuildRepresentation(ReadOnlySpan<Complex> data)
     {
+        if (data.Length != _signalMemoryHandle.Length)
+        {
+            throw new NotImplementedException("Implement resize");
+        }
+        
         //todo: probably this is redundant copy
         data.CopyTo(_signalMemoryHandle.Span);
 

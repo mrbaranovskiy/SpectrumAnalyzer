@@ -9,6 +9,11 @@ public class WaterfallRepresentation : RendererRepresentationAbstract<WaterfallR
     {
     }
 
+    public override void UpdateDrawingProperties(WaterfallRepresentation properties)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void BuildRepresentation(ReadOnlySpan<Complex> data)
     {
         throw new NotImplementedException();

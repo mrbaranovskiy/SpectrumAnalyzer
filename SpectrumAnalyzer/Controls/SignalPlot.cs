@@ -36,7 +36,7 @@ public class SignalPlot : TemplatedControl
         var height = (int)ctrl.Height;
         
         return new WriteableBitmap(
-            new PixelSize((int)width, (int)height),
+            new PixelSize(width, height),
             new Vector(96, 96),
             PixelFormat.Rgba8888,
             AlphaFormat.Premul);       

@@ -11,12 +11,9 @@ public class TransportTests
     [TestMethod]
     public async Task TestUHDTransportGivesValues()
     {
-        
-        
-        
-            
         var moq = new Mock<IDeviceNativeApi<float>>();
         var transport = new UHDTransport(moq.Object);
+        transport.Start();
         Complex[] array = Array.Empty<Complex>();
         transport.DataReceived += (sender, args) =>
         {
@@ -27,6 +24,5 @@ public class TransportTests
         
         await Task.Delay(1000);
         Assert.IsTrue(array.Any());
-
     }
 }

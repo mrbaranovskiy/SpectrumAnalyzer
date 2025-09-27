@@ -48,6 +48,8 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
         }
     }
 
+
+    public abstract void UpdateDrawingProperties(TDrawingProperties properties);
     public abstract void BuildRepresentation(ReadOnlySpan<TData> data);
     public abstract ReadOnlySpan<byte> CurrentFrame { get; }
 
