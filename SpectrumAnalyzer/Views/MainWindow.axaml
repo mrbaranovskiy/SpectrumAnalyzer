@@ -7,6 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="SpectrumAnalyzer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        Name="wnd"
         Icon="/Assets/avalonia-logo.ico"
         Title="SpectrumAnalyzer">
     
@@ -15,9 +16,12 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <Grid ClipToBounds="True">
+                        
+                        <!-- This is our rendering viewport -->
                         <Image Source="{TemplateBinding Source}"
                                Stretch="Fill"
                                IsHitTestVisible="False" />
+                        
                         <global:SignalPlotOverlay
                             MinX="{TemplateBinding MinX}"
                             MaxX="{TemplateBinding MaxX}"
@@ -42,17 +46,34 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Grid Width="800" Height="320">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
         <global:SignalPlot
-            MinX="{Binding MinFrequencyAxis}"
-            MaxX="{Binding MaxFrequencyAxis}"
-            MinY="{Binding MinMagnitudeDbAxis}"
-            MaxY="{Binding MaxMagnitudeDbAxis}"
-            
-            GridDivisionsX="10" GridDivisionsY="8"
-            GridBrush="#404040" AxisBrush="#E0E0E0"
-            GridThickness="1" AxisThickness="1.5"
-            PlotPadding="40,16,16,28"
-            Width="800" Height="300" />
+                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                           MinX="{Binding MinFrequencyAxis}"
+                           MaxX="{Binding MaxFrequencyAxis}"
+                           MinY="{Binding MinMagnitudeDbAxis}"
+                           MaxY="{Binding MaxMagnitudeDbAxis}"
+                           Representation="{Binding FftRepresentation}"
+                           GridDivisionsX="10" GridDivisionsY="8"
+                           GridBrush="#404040" AxisBrush="#E0E0E0"
+                           GridThickness="1" AxisThickness="1.5"
+                           PlotPadding="40,16,16,28"
+                           Height="{Binding #wnd.Height}"
+                           Width="{Binding #wnd.Width}"
+                           RenderSource="{Binding Renderer, Mode=OneWay}"
+                           ViewportHeight="{Binding FftCtrlHeight, Mode=OneWayToSource}"
+                           ViewportWidth="{Binding FftCtrlWidth, Mode=OneWayToSource}"
+        />
+        
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <Button Command="{Binding StartReceivingCommand}" Width="80">Start</Button>            
+            <Button Command="{Binding StopReceivingCommand}" Width="80">Stop</Button>            
+            <Button Command="{Binding RestartCommand}" Width="80">Restart</Button>            
+        </StackPanel>
+        
     </Grid>
 </Window>

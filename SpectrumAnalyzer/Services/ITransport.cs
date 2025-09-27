@@ -9,6 +9,11 @@ public sealed class DataReceivedEventArgs(int Size, long TimeStamp) : EventArgs
     public long TimeStamp { get; } = TimeStamp;
 }
 
+public interface IDataReady
+{
+    event EventHandler<EventArgs> DataReady;
+}
+
 public interface IDataReceived<T> where T : EventArgs
 {
     event EventHandler<DataReceivedEventArgs> DataReceived;

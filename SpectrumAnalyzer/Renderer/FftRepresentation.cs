@@ -15,11 +15,13 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
     public FftRepresentation(FFTRepresentationProperties properties) 
         : base(properties)
     {
-        InitBuffers();
+       UpdateDrawingProperties(properties);
     }
 
     private void InitBuffers()
     {
+        
+        
         _bitmapGraphics = BitmapGraphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
         
         var windowSize = DrawingProperties.Height * DrawingProperties.Width * 4;
@@ -33,10 +35,25 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
 
     public override void UpdateDrawingProperties(FFTRepresentationProperties properties)
     {
-        _bitmapPool.Return(_bitmapBuffer);
-        ArrayPool<Complex>.Shared.Return(_signalBuffer);
+        if(properties.Width <= 0 || properties.Height <= 0)
+            return;
+        
+        //do nothing if buffers size not affected.
+        if(DrawingProperties.Width == properties.Width
+           && DrawingProperties.Height == properties.Height 
+           && DrawingProperties.DataBufferLength == properties.DataBufferLength
+           )
+            
+            return;
+
+        if (_bitmapBuffer != null) _bitmapPool?.Return(_bitmapBuffer);
+        if (_signalBuffer != null) ArrayPool<Complex>.Shared.Return(_signalBuffer);
+        
+        DrawingProperties = properties;
         
         InitBuffers();
+
+       
     }
     
     public override void Dispose()
@@ -137,6 +154,6 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
 
     protected override void HandleDrawingPropertiesUpdated()
     {
-        throw new NotImplementedException();
+        
     }
 }

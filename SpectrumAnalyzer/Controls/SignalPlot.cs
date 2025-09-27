@@ -6,39 +6,81 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using SpectrumAnalyzer.Renderer;
+using SpectrumAnalyzer.Services;
 using Vector = Avalonia.Vector;
 
 namespace SpectrumAnalyzer.Controls;
 
 public class SignalPlot : TemplatedControl
 {
-
     public SignalPlot()
     {
-        SizeChanged+= (sender, args) =>
+        SizeChanged += (sender, args) =>
         {
-            if (sender is TemplatedControl ctrl)
+            ViewportHeight = (int)Height;
+            ViewportWidth = (int)Width;
+            
+            if (sender is TemplatedControl {Height: > 0 , Width: > 0} ctrl)
                 Source = CreateBitmap(ctrl);
         };
 
         Loaded += (sender, args) =>
         {
-            if (sender is TemplatedControl ctrl)
+            ViewportHeight = (int)Height;
+            ViewportWidth = (int)Width;
+          
+            
+            if (sender is TemplatedControl {Height: > 0 , Width: > 0} ctrl )
                 Source = CreateBitmap(ctrl);
         };
     }
-
 
     private WriteableBitmap CreateBitmap(TemplatedControl ctrl)
     {
         var width = (int)ctrl.Width;
         var height = (int)ctrl.Height;
-        
         return new WriteableBitmap(
             new PixelSize(width, height),
             new Vector(96, 96),
             PixelFormat.Rgba8888,
             AlphaFormat.Premul);       
+    }
+
+    private int _viewportWidth;
+
+    public static readonly DirectProperty<SignalPlot, int> ViewportWidthProperty = AvaloniaProperty.RegisterDirect<SignalPlot, int>(
+        nameof(ViewportWidth), o => o.ViewportWidth, (o, v) => o.ViewportWidth = v);
+
+    public int ViewportWidth
+    {
+        get => _viewportWidth;
+        set => SetAndRaise(ViewportWidthProperty, ref _viewportWidth, value);
+    }
+
+    private int _viewportHeight;
+
+    public static readonly DirectProperty<SignalPlot, int> ViewportHeightProperty = AvaloniaProperty.RegisterDirect<SignalPlot, int>(
+        nameof(ViewportHeight), o => o.ViewportHeight, (o, v) => o.ViewportHeight = v);
+
+    public int ViewportHeight
+    {
+        get => _viewportHeight;
+        set => SetAndRaise(ViewportHeightProperty, ref _viewportHeight, value);
+    }
+
+
+    private IDataReady _renderSource;
+
+    public static readonly DirectProperty<SignalPlot, IDataReady> RenderSourceProperty = AvaloniaProperty.RegisterDirect<SignalPlot, IDataReady>(
+        nameof(RenderSource), o => o.RenderSource, setter: (o, v) =>
+        {
+            o.RenderSource = v;
+        });
+
+    public IDataReady RenderSource
+    {
+        get => _renderSource;
+        set => SetAndRaise(RenderSourceProperty, ref _renderSource, value);
     }
 
     // Bottom layer: bind your WriteableBitmap (or any IBitmap)
@@ -47,7 +89,7 @@ public class SignalPlot : TemplatedControl
         AvaloniaProperty.Register<SignalPlot, WriteableBitmap?>(nameof(Source));
 
     // Axes range for labels (overlay doesn’t care about how you draw pixels)
-
+    
     public static readonly StyledProperty<double> MinXProperty =
         AvaloniaProperty.Register<SignalPlot, double>(nameof(MinX), 0);
 
@@ -85,11 +127,10 @@ public class SignalPlot : TemplatedControl
     public static readonly StyledProperty<IBrush> LabelBrushProperty =
         AvaloniaProperty.Register<SignalPlot, IBrush>(nameof(LabelBrush), Brushes.White);
 
-    // Padding is used as chart inner margin (space for labels)
-
     public static readonly StyledProperty<Thickness> PlotPaddingProperty =
         AvaloniaProperty.Register<SignalPlot, Thickness>(nameof(PlotPadding), new Thickness(32, 16, 16, 28));
-
+    
+    
     public static readonly StyledProperty<IRendererRepresentation<Complex>> RepresentationProperty = AvaloniaProperty.Register<SignalPlot, IRendererRepresentation<Complex>>(
         nameof(Representation));
 
@@ -98,7 +139,6 @@ public class SignalPlot : TemplatedControl
         get => GetValue(RepresentationProperty);
         set => SetValue(RepresentationProperty, value);
     }
-    
     //
     public WriteableBitmap? Source
     {
@@ -127,10 +167,9 @@ public class SignalPlot : TemplatedControl
     {
         if(Representation is null || Source is null)
             return;
+        
+        UpdateData(Representation.CurrentFrame);
 
-        // var frame = Representation.CurrentFrame;
-        // UpdateData();
-        //
         var src = new Rect(0, 0, Width, Height);
         var dst = new Rect(Bounds.Size);
         
@@ -142,7 +181,7 @@ public class SignalPlot : TemplatedControl
         using var fb = Source.Lock();            // ILockedFramebuffer
         var dst = new Span<byte>((void*)fb.Address, fb.RowBytes * fb.Size.Height);
         
-
+        
         var srcStride = (int)Width * 4;
         if (fb.RowBytes == srcStride)
         {

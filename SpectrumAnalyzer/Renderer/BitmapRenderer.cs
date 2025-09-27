@@ -19,7 +19,6 @@ public abstract class AbstractBitmapRenderer<TData>
     public void AddRepresentation(IRendererRepresentation<TData> representation)
     {
         ArgumentNullException.ThrowIfNull(representation);
-        
         _representations.Add(representation);
     }
 
@@ -34,7 +33,16 @@ public abstract class AbstractBitmapRenderer<TData>
         foreach (var r in _representations)
             r.BuildRepresentation(data);
         
+        OnDataReady();
+        
         _dataPool.ReleaseLatestData();
+    }
+
+    public event EventHandler<EventArgs>? DataReady;
+
+    protected virtual void OnDataReady()
+    {
+        DataReady?.Invoke(this, EventArgs.Empty);
     }
 }
 

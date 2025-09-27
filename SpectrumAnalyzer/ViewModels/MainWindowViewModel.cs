@@ -14,12 +14,12 @@ namespace SpectrumAnalyzer.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly IDeviceConnection<Complex, UsprConnectionProperties> _usrpConnection;
-    private int _sampleRate;
+    private int _samplingRate;
     private int _bandwidth;
     private int _centerFrequency;
     private IStreamingDataPool<Complex> _streamingPool;
     private ITransport<Complex> _transport;
-    private ComplexDataRenderer _bitmapRenderer;
+    private ComplexDataRenderer _renderer;
     
     private double _minFrequencyAxis;
     private double _maxFrequencyAxis;
@@ -34,8 +34,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private FFTRepresentationProperties _fftProperties; 
     private WaterfallRepresentationProperties _waterfallRepresentationProperties;
     
-    private int _fftCtrlWidth;
-    private int _fftCtrlHeight;
+    private double _fftCtrlWidth;
+    private double _fftCtrlHeight;
 
     public MainWindowViewModel(IDeviceConnection<Complex, UsprConnectionProperties> usrpConnection)
     {
@@ -46,7 +46,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             100,
             100,
             Bandwidth,
-            CenterFrequency, SampleRate,
+            CenterFrequency, SamplingRate,
             new AxisRange(-400, 50),
             new AxisRange(0, Bandwidth));
         
@@ -54,9 +54,17 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         MinMagnitudeDbAxis = -300;
         MaxMagnitudeDbAxis = 60;
+        Bandwidth = 10000;
         MinFrequencyAxis = 0;
         MaxFrequencyAxis = Bandwidth * 2;
+        FftCtrlWidth = 800;
+        FftCtrlHeight = 300;
+        SamplingRate = 32000;
+        CenterFrequency = 10000;
+        
+        _representations.Add(_fftRepresentation);
     }
+    
 
     [RelayCommand]
     public async Task StartReceiving()
@@ -72,39 +80,49 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             BandwidthHz = Bandwidth,
             CenterFrequencyHz = CenterFrequency,
             GainDb = 50,
-            SampleRateHz = SampleRate
+            SampleRateHz = SamplingRate
         };
 
         _transport = _usrpConnection.ConnectToDevice(connectionProps);
             
         _streamingPool = new StreamingIQPool(_transport);
-        _bitmapRenderer = new ComplexDataRenderer(_streamingPool);
+        Renderer = new ComplexDataRenderer(_streamingPool);
         
         UpdateFftProperties();
 
         foreach (var rep in _representations) 
-            _bitmapRenderer.AddRepresentation(rep);
-        
-       
+            _renderer.AddRepresentation(rep);
+
+        _transport.Start();
         _streamingPool.DataReceived += HandleDataUpdate;
-        
+
     }
 
     [RelayCommand]
-    public async Task StopReceiving() { }
+    public async Task StopReceiving()
+    {
+        _transport?.Stop();
+    }
 
     [RelayCommand]
     public async Task Restart() {}
 
-    public int SampleRate
+    public ComplexDataRenderer Renderer
     {
-        get => _sampleRate;
+        get => _renderer;
         set
         {
-            _sampleRate = value;
-            if (_sampleRate < 1) 
-                throw new ArgumentOutOfRangeException(nameof(SampleRate));
+            _renderer = value;
             this.RaisePropertyChanged();
+        }
+    }
+
+    public int SamplingRate
+    {
+        get => _samplingRate;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _samplingRate, value);
             UpdateFftProperties();
         }
     }
@@ -114,10 +132,19 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         get => _bandwidth;
         set
         {
-            if (_bandwidth < 1) 
-                throw new ArgumentOutOfRangeException(nameof(SampleRate));
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
             this.RaiseAndSetIfChanged(ref _bandwidth, value);
             UpdateFftProperties();
+        }
+    }
+
+    public FftRepresentation FftRepresentation
+    {
+        get => _fftRepresentation;
+        set
+        {
+            _fftRepresentation = value;
+            this.RaisePropertyChanged();
         }
     }
 
@@ -131,7 +158,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    public int FftCtrlWidth
+    public double FftCtrlWidth
     {
         get => _fftCtrlWidth;
         set
@@ -141,7 +168,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
     
-    public int FftCtrlHeight
+    public double FftCtrlHeight
     {
         get => _fftCtrlHeight;
         set
@@ -151,10 +178,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
     
-    // Char options
-
-    //
-
     public double MinFrequencyAxis
     {
         get => _minFrequencyAxis;
@@ -171,10 +194,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         get => _maxFrequencyAxis;
         set
         {
-            {
-                _maxFrequencyAxis = value;
-                this.RaiseAndSetIfChanged(ref _maxFrequencyAxis, value);
-            }
+            _maxFrequencyAxis = value;
+            this.RaiseAndSetIfChanged(ref _maxFrequencyAxis, value);
         }
     }
 
@@ -202,11 +223,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         _fftProperties = _fftProperties with
         {
-            Width = FftCtrlWidth,
-            Height = FftCtrlHeight,
+            Width = (int)FftCtrlWidth,
+            Height = (int)FftCtrlHeight,
             Bandwidth = Bandwidth,
             CenterFrequency = CenterFrequency,
-            SamplingRate = SampleRate,
+            SamplingRate = SamplingRate,
             XAxisRange = new AxisRange(_minFrequencyAxis, _maxFrequencyAxis),
             YAxisRange = new AxisRange(_minMagnitudeDbAxis, _maxMagnitudeDbAxis)
         };
@@ -216,7 +237,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     private void HandleDataUpdate(object? sender, DataReceivedEventArgs e)
     {
-        _bitmapRenderer?.Render();
+        _renderer?.Render();
     }
 
     public void Dispose(){ }

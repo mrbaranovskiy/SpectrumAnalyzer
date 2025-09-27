@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using SpectrumAnalyzer.Services.Native;
 
 namespace SpectrumAnalyzer.Services;
 
@@ -8,7 +9,7 @@ public class UsprDeviceConnection : IDeviceConnection<Complex, UsprConnectionPro
 {
     public ITransport<Complex> ConnectToDevice(UsprConnectionProperties connectionProps)
     {
-        throw new NotImplementedException();
+        return new UHDTransport(new UHDApiFake());
     }
     
     public void Dispose()

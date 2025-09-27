@@ -7,6 +7,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using SpectrumAnalyzer.Controls;
 using SpectrumAnalyzer.Utilities;
+using SpectrumAnalyzer.ViewModels;
 
 namespace SpectrumAnalyzer.Views;
 
@@ -31,6 +32,7 @@ public partial class MainWindow : Window
         // _displayPointsPool = new Memory<double>(displayPoint, 0, NumberOfDisplayPoint);
         //
          InitializeComponent();
+         
         //
         // _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(50), DispatcherPriority.Normal, HandleDispatcherTimerCallback);
         // _ctrl = this.FindControl<WaterfallControl>("waterfall");
