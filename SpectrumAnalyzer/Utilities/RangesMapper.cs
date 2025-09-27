@@ -17,14 +17,14 @@ public static class RangesMapper
     }
 
     public static (double, double) Map2Point(
-        in Complex point,
+        in Point point,
         double screen_h, double screen_w,
         double y_min, double y_max,
         double x_min, double x_max,
         double factor_x = 1.0, double factor_y = 1.0)
     {
-        var yr = Remap(point.Imaginary, y_min, y_max, 0, screen_h) * factor_y;
-        var xr = Remap(point.Real, x_min, x_max, 0, screen_w) * factor_x;
+        var yr = Remap(point.Y, y_min, y_max, 0, screen_h) * factor_y;
+        var xr = Remap(point.X, x_min, x_max, 0, screen_w) * factor_x;
         
         return (xr, yr);
     }

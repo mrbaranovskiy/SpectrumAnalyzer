@@ -5,22 +5,22 @@ using Avalonia.Media;
 
 namespace SpectrumAnalyzer.Utilities;
 
-public sealed class Graphics
+public sealed class BitmapGraphics
 {
     private readonly int _width;
     private readonly int _height;
     private readonly double _factor;
 
-    private Graphics(int width, int height, double factor)
+    private BitmapGraphics(int width, int height, double factor)
     {
         _width = width;
         _height = height;
         _factor = factor;
     }
     
-    public static Graphics CreateGraphics(int width, int height, double factor)
+    public static BitmapGraphics CreateGraphics(int width, int height, double factor)
     {
-        return new Graphics(width, height, factor);
+        return new BitmapGraphics(width, height, factor);
     }
     
     private static int Round(float n)

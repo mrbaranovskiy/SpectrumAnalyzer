@@ -6,7 +6,7 @@ using SpectrumAnalyzer.Services;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public class StreamingDataPool : IStreamingDataPool<Complex>
+public sealed class StreamingDataPool : IStreamingDataPool<Complex>
 {
     private readonly ITransport<Complex> _transport;
     private readonly ArrayPool<Complex> _pool;
@@ -19,14 +19,17 @@ public class StreamingDataPool : IStreamingDataPool<Complex>
         _transport = transport;
         _transport.DataReceived += TransportOnDataReceived;
         _queue = new ConcurrentQueue<Complex[]>();
+        MaxQueueSize = 10;
     }
 
     private void TransportOnDataReceived(object? sender, EventArgs e)
     {
+        if(_queue.Count >= MaxQueueSize) return;
         // delete this bliat`. No sense to read faster in transport than process in
         // Streaming pool. 
         var data = _transport.GetRawData();
         var buffer = _pool.Rent(data.Length);
+        data.CopyTo(buffer);
         _queue.Enqueue(buffer);
         OnDataReceived(data.Length);
     }
@@ -39,7 +42,7 @@ public class StreamingDataPool : IStreamingDataPool<Complex>
         return _queue.TryPeek(out var buffer) ? buffer.Length : 0;
     }
 
-    public int RequestedDataLength { get; }
+    public int MaxQueueSize { get; set; }
 
     public bool RequestLatestCopy(Span<Complex> buffer)
     {
@@ -83,7 +86,7 @@ public class StreamingDataPool : IStreamingDataPool<Complex>
 
     public event EventHandler<DataReceivedEventArgs>? DataReceived;
 
-    protected virtual void OnDataReceived(int size)
+    private void OnDataReceived(int size)
     {
         DataReceived?.Invoke(this, new DataReceivedEventArgs(size, DateTime.UtcNow.ToFileTime()));
     }

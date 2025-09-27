@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SpectrumAnalyzer.Renderer;
 
@@ -15,6 +16,8 @@ public interface IRendererRepresentation<TData> : IDisposable where TData : stru
     ReadOnlySpan<byte> CurrentFrame { get; }
 }
 
+
+//todo: handle DrawingProperties change!!!!
 public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
     : IRendererRepresentation<TData> where TData : struct
 {
@@ -27,9 +30,10 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
     private TDrawingProperties _drawingProperties;
     protected readonly int _singleBufferLength;
 
-    protected RendererRepresentationAbstract(int singleBufferLength)
+    protected RendererRepresentationAbstract([DisallowNull] TDrawingProperties drawingProperties, int singleBufferLength)
     {
         _singleBufferLength = singleBufferLength;
+        _drawingProperties = drawingProperties ?? throw new ArgumentNullException(nameof(drawingProperties));
     }
 
     protected TDrawingProperties DrawingProperties

@@ -20,7 +20,7 @@ public partial class MainWindow : Window
     private readonly Memory<double> _spectrumPool;
     private readonly Memory<double> _displayPointsPool;
     private readonly Memory<byte> _bitmapDataPool;
-    private readonly Graphics _graphUtils;
+    private readonly BitmapGraphics _graphUtils;
 
     public MainWindow()
     {
@@ -34,7 +34,7 @@ public partial class MainWindow : Window
         
         _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(50), DispatcherPriority.Normal, HandleDispatcherTimerCallback);
         _ctrl = this.FindControl<WaterfallControl>("waterfall");
-        _graphUtils = Graphics.CreateGraphics(_ctrl.WidthPx, _ctrl.HeightPx, 1.0);
+        _graphUtils = BitmapGraphics.CreateGraphics(_ctrl.WidthPx, _ctrl.HeightPx, 1.0);
         
         var btmPool = ArrayPool<byte>.Shared.Rent(_ctrl.WidthPx * _ctrl.HeightPx * 4);
         _bitmapDataPool = new Memory<byte>(btmPool, 0, _ctrl.WidthPx * _ctrl.HeightPx * 4);
@@ -54,9 +54,9 @@ public partial class MainWindow : Window
         for (var i = 0; i < NumberOfDisplayPoint; i++)
         {
             var x = _displayPointsPool.Span[i];
-            var im = new Complex((double)i / NumberOfDisplayPoint, x);
+            //var im = new Complex((double)i / NumberOfDisplayPoint, x);
             
-            var scaledPt = RangesMapper.Map2Point(im, 
+            var scaledPt = RangesMapper.Map2Point(new Point(x, (double)i / NumberOfDisplayPoint), 
                 _ctrl.WidthPx, 
                 _ctrl.HeightPx, 
                 -1.0, 1.0, 0, 0.5); // we need to decimate. values for displaying.

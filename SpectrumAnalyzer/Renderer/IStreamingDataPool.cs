@@ -12,5 +12,6 @@ public interface IStreamingDataPool<TData>
     ReadOnlySpan<TData> PeekLatestData();
     void ReleaseLatestData();
     int RequestLatestDataLength();
-    int RequestedDataLength { get; }
+    int MaxQueueSize { get; set; }
+    
 }

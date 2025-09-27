@@ -23,6 +23,7 @@ public interface ITransport<T>
 
     DateTime LastDataReceived { get; }
     ReadOnlySpan<T> GetRawData();
+    int ReceivingChunkSize { get; set; }
 }
 
 // var device = Device.UHD.GetDevice();

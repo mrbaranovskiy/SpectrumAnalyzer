@@ -13,7 +13,7 @@ public class UtilitiesTests
     [TestMethod]
     public void TestMethod1()
     {
-        var graphics = Graphics.CreateGraphics(100, 100, 1.0);
+        var graphics = BitmapGraphics.CreateGraphics(100, 100, 1.0);
         var buffer = new byte[100 * 100 * 4];
         var image = new Span<byte>(buffer);
         
@@ -34,7 +34,7 @@ public class UtilitiesTests
     [TestMethod]
     public void ComplexRemapGivesCorrectValues()
     {
-        var point = new Complex(0.5, 0.5);
+        var point = new Point(0.5, 0.5);
         var result = RangesMapper.Map2Point(point, 100, 100, 0.0, 1.0, 0.0, 1.0);
         
         Assert.IsTrue(result.Item1 == 50);
@@ -44,7 +44,7 @@ public class UtilitiesTests
     [TestMethod]
     public void ComplexRemapGivesCorrectValuesScaled()
     {
-        var point = new Complex(0.5, 0.5);
+        var point = new Point(0.5, 0.5);
         var result = RangesMapper.Map2Point(point, 100, 100, 0.0, 1.0, 0.0, 1.0, 0.50, 0.50);
         
         Assert.IsTrue(result.Item1 == 25);

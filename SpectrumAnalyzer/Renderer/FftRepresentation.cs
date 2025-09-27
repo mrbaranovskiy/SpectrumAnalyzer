@@ -1,19 +1,30 @@
 ﻿using System;
 using System.Buffers;
+using System.Linq;
 using System.Numerics;
 using Avalonia;
-using Avalonia.Media;
 using SpectrumAnalyzer.Utilities;
+using Vector = System.Numerics.Vector;
+
+using System;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using Bitmap = System.Drawing.Bitmap;
+using Color = System.Drawing.Color;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
+
 
 namespace SpectrumAnalyzer.Renderer;
 
 public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentationProperties, Complex>
 {
-    private readonly Graphics _graphics;
+    private readonly BitmapGraphics _bitmapGraphics;
 
-    public FftRepresentation(int singleBufferLength) : base(singleBufferLength)
+    public FftRepresentation(FFTRepresentationProperties properties, int singleBufferLength) 
+        : base(properties, singleBufferLength)
     {
-        _graphics = Graphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
+        _bitmapGraphics = BitmapGraphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
         
         var windowSize = DrawingProperties.Height * DrawingProperties.Width * 4;
         
@@ -21,7 +32,7 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         _bitmapBuffer = _bitmapPool.Rent(windowSize);
         _bitmapMemoryHandle = new Memory<byte>(_bitmapBuffer, 0, windowSize);
         _signalBuffer = ArrayPool<Complex>.Shared.Rent(singleBufferLength);
-        _signalMemoryHandle = new Memory<Complex>(_signalBuffer, 0, windowSize);
+        _signalMemoryHandle = new Memory<Complex>(_signalBuffer, 0, singleBufferLength);
     }
 
     public override void BuildRepresentation(ReadOnlySpan<Complex> data)
@@ -71,7 +82,7 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         //there is no much sense to draw them all.
         // temporary I took 3 screen width. 
         // Mayne some Shannon theorem to avoid signal lost.
-        int numberOfDrawedPoints = DrawingProperties.Width * 3;
+        int numberOfDrawedPoints = _signalBuffer.Length / 2;
 
         var resampledPower = ArrayPool<double>.Shared.Rent(numberOfDrawedPoints);
         var resPowerMem = new Memory<double>(resampledPower, 0, numberOfDrawedPoints);
@@ -86,13 +97,29 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         
         GeneratePoints(screenPointsMem.Span, ys, xs );
         
-        _graphics.DrawLines(_bitmapMemoryHandle.Span, screenPointsMem.Span, Colors.White);
+        _bitmapGraphics.DrawLines(_bitmapMemoryHandle.Span, screenPointsMem.Span, Colors.White);
+        //var btm = new Bitmap(DrawingProperties.Width, DrawingProperties.Height, PixelFormat.Format32bppRgb);
+        //UpdateData(btm, screenPointsMem.Span);
+        //btm.Save("D:\\fft.bmp");
+
+        // var cnt = _bitmapMemoryHandle.Span.ToArray().Count(s => s > 0);
         
         ArrayPool<Point>.Shared.Return(screenPoints); 
         ArrayPool<double>.Shared.Return(resampledPower);
         ArrayPool<double>.Shared.Return(resampledFreq);
 
         //return _bitmapMemoryHandle.Span;
+    }
+    
+    public void UpdateData(Bitmap bitmap, ReadOnlySpan<Point> pixels) // length = w*h*4 (premul)
+    {
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            if (pixels[i].X < 0 || pixels[i].X >= bitmap.Width || pixels[i].Y < 0 || pixels[i].Y >= bitmap.Height)
+                continue;
+            
+            bitmap.SetPixel((int)pixels[i].X, (int)pixels[i].Y, Color.Blue);
+        }        
     }
 
     public override ReadOnlySpan<byte> CurrentFrame => _bitmapMemoryHandle.Span;
@@ -103,10 +130,9 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
     {
         for (int i = 0; i < ys.Length; i++)
         {
-            var complex = new Complex(ys[i], xs[i]);
-            var scaledPt = RangesMapper.Map2Point(complex, 
-                DrawingProperties.Width,
+            var scaledPt = RangesMapper.Map2Point(new Point(xs[i], ys[i]), 
                 DrawingProperties.Height,
+                DrawingProperties.Width,
                 DrawingProperties.YAxisRange.Min,
                 DrawingProperties.YAxisRange.Max,
                 DrawingProperties.XAxisRange.Min,

@@ -18,7 +18,7 @@ public static class SignalGenerator
         
         for (int i = 0; i < output.Length; i++)
         {
-            output[i] = 5 * new Complex( 2 * Math.Cos(2 * Math.PI * center_fr * t),0);
+            output[i] = 0.001 * new Complex( 2 * Math.Cos(2 * Math.PI * center_fr * t),0);
             t += dt;
         }
         //
@@ -30,7 +30,7 @@ public static class SignalGenerator
             {
                 // lets generate only Q part.. should be enought for waterfall
                 var xt = amplitude * Math.Sin(2 * Math.PI * fr * t);
-                output[i] += new Complex(xt, 0);
+                output[i] += 0.000 * new Complex(xt, 0);
         
                 t += dt;
             }    

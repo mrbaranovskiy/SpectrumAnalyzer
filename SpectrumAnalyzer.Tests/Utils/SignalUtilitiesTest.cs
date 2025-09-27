@@ -18,6 +18,28 @@ public class SignalUtilitiesTest
     }
 
     [TestMethod]
+    public void Test()
+    {
+        double[] data = new double[1 << 12];
+        FftSharp.SampleData.AddSin(data, 1000_000, 500e3, 2);
+        FftSharp.SampleData.AddSin(data, 1000_000, 100e3, 3);
+
+        var spectrum = FftSharp.FFT.Forward(data);
+        double[] psd = FftSharp.FFT.Power(spectrum);
+        double[] freq = FftSharp.FFT.FrequencyScale(psd.Length, 1000_000);
+        
+        int idx = 0;
+        for (int i = 0; i < psd.Length; i++)
+        {
+            if (psd[idx] < psd[i])
+                idx = i;
+        }
+        
+        var result = freq[idx];
+        Assert.IsTrue(false);
+    }
+
+    [TestMethod]
     public void TestSignalGenerator()
     {
         var spectrum = new Complex[1 << 15];
