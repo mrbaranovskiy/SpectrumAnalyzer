@@ -43,8 +43,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _representations = new List<IRendererRepresentation<Complex>>();
         _fftProperties = new FFTRepresentationProperties(
             ITransport<Complex>.DefaultChunkSize,
-            0,
-            0,
+            100,
+            100,
             Bandwidth,
             CenterFrequency, SampleRate,
             new AxisRange(-400, 50),

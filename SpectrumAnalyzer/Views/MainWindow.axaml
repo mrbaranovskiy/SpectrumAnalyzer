@@ -46,7 +46,8 @@
         <global:SignalPlot
             MinX="{Binding MinFrequencyAxis}"
             MaxX="{Binding MaxFrequencyAxis}"
-            MinY="{Binding MinMagnitudeDbAxis}" MaxY="{Binding MaxMagnitudeDbAxis}"
+            MinY="{Binding MinMagnitudeDbAxis}"
+            MaxY="{Binding MaxMagnitudeDbAxis}"
             
             GridDivisionsX="10" GridDivisionsY="8"
             GridBrush="#404040" AxisBrush="#E0E0E0"
@@ -54,11 +55,4 @@
             PlotPadding="40,16,16,28"
             Width="800" Height="300" />
     </Grid>
-    <!-- <StackPanel Width="1000" Height="500"> -->
-    <!--     <global:WaterfallControl Name="waterfall" -->
-    <!--                              Width="{Binding $parent.Width}" -->
-    <!--                              Height="{Binding $parent.Height}" -->
-    <!--     /> -->
-    <!-- </StackPanel> -->
-
 </Window>
