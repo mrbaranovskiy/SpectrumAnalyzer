@@ -20,6 +20,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private IStreamingDataPool<Complex> _streamingPool;
     private ITransport<Complex> _transport;
     private ComplexDataRenderer _bitmapRenderer;
+    
+    private double _minFrequencyAxis;
+    private double _maxFrequencyAxis;
+    private double _minMagnitudeDbAxis;
+    private double _maxMagnitudeDbAxis;
 
     private List<IRendererRepresentation<Complex>> _representations;
     
@@ -37,6 +42,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _usrpConnection = usrpConnection;
         _representations = new List<IRendererRepresentation<Complex>>();
         _fftProperties = new FFTRepresentationProperties(
+            ITransport<Complex>.DefaultChunkSize,
             0,
             0,
             Bandwidth,
@@ -44,7 +50,12 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             new AxisRange(-400, 50),
             new AxisRange(0, Bandwidth));
         
-        _fftRepresentation = new FftRepresentation(_fftProperties, 1024);
+        _fftRepresentation = new FftRepresentation(_fftProperties);
+
+        MinMagnitudeDbAxis = -300;
+        MaxMagnitudeDbAxis = 60;
+        MinFrequencyAxis = 0;
+        MaxFrequencyAxis = Bandwidth * 2;
     }
 
     [RelayCommand]
@@ -68,12 +79,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             
         _streamingPool = new StreamingIQPool(_transport);
         _bitmapRenderer = new ComplexDataRenderer(_streamingPool);
+        
+        UpdateFftProperties();
 
         foreach (var rep in _representations) 
             _bitmapRenderer.AddRepresentation(rep);
-
-        _streamingPool.DataReceived += HandleDataUpdate;
         
+       
+        _streamingPool.DataReceived += HandleDataUpdate;
         
     }
 
@@ -92,13 +105,20 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             if (_sampleRate < 1) 
                 throw new ArgumentOutOfRangeException(nameof(SampleRate));
             this.RaisePropertyChanged();
+            UpdateFftProperties();
         }
     }
 
     public int Bandwidth
     {
         get => _bandwidth;
-        set => this.RaiseAndSetIfChanged(ref _bandwidth, value);
+        set
+        {
+            if (_bandwidth < 1) 
+                throw new ArgumentOutOfRangeException(nameof(SampleRate));
+            this.RaiseAndSetIfChanged(ref _bandwidth, value);
+            UpdateFftProperties();
+        }
     }
 
     public int CenterFrequency
@@ -108,7 +128,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             this.RaiseAndSetIfChanged(ref _centerFrequency, value);
             UpdateFftProperties();
-            
         }
     }
 
@@ -134,10 +153,50 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     
     // Char options
 
-    private double _minFrequency;
-    private double _maxFrequency;
-    private double _minMagnitudeDb;
-    private double _maxMagnitudeDb;
+    //
+
+    public double MinFrequencyAxis
+    {
+        get => _minFrequencyAxis;
+        set
+        {
+            _minFrequencyAxis = value;
+            this.RaiseAndSetIfChanged(ref _minFrequencyAxis, value);
+            UpdateFftProperties();
+        }
+    }
+
+    public double MaxFrequencyAxis
+    {
+        get => _maxFrequencyAxis;
+        set
+        {
+            {
+                _maxFrequencyAxis = value;
+                this.RaiseAndSetIfChanged(ref _maxFrequencyAxis, value);
+            }
+        }
+    }
+
+    public double MinMagnitudeDbAxis
+    {
+        get => _minMagnitudeDbAxis;
+        set
+        {
+            _minMagnitudeDbAxis = value;
+            this.RaiseAndSetIfChanged(ref _minMagnitudeDbAxis, value);
+        }
+    }
+
+    public double MaxMagnitudeDbAxis
+    {
+        get => _maxMagnitudeDbAxis;
+        set
+        {
+            _maxMagnitudeDbAxis = value;
+            this.RaiseAndSetIfChanged(ref _maxMagnitudeDbAxis, value);
+        }
+    }
 
     private void UpdateFftProperties()
     {
@@ -148,8 +207,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             Bandwidth = Bandwidth,
             CenterFrequency = CenterFrequency,
             SamplingRate = SampleRate,
-            // XAxisRange = 
-            // YAxisRange =
+            XAxisRange = new AxisRange(_minFrequencyAxis, _maxFrequencyAxis),
+            YAxisRange = new AxisRange(_minMagnitudeDbAxis, _maxMagnitudeDbAxis)
         };
         
         _fftRepresentation.UpdateDrawingProperties(_fftProperties);

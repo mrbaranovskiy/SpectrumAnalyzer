@@ -10,10 +10,15 @@ namespace SpectrumAnalyzer.Renderer;
 
 public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentationProperties, Complex>
 {
-    private readonly BitmapGraphics _bitmapGraphics;
+    private BitmapGraphics _bitmapGraphics;
 
-    public FftRepresentation(FFTRepresentationProperties properties, int singleBufferLength) 
-        : base(properties, singleBufferLength)
+    public FftRepresentation(FFTRepresentationProperties properties) 
+        : base(properties)
+    {
+        InitBuffers();
+    }
+
+    private void InitBuffers()
     {
         _bitmapGraphics = BitmapGraphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
         
@@ -22,21 +27,28 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         _bitmapPool = ArrayPool<byte>.Create(windowSize, 1);
         _bitmapBuffer = _bitmapPool.Rent(windowSize);
         _bitmapMemoryHandle = new Memory<byte>(_bitmapBuffer, 0, windowSize);
-        _signalBuffer = ArrayPool<Complex>.Shared.Rent(singleBufferLength);
-        _signalMemoryHandle = new Memory<Complex>(_signalBuffer, 0, singleBufferLength);
+        _signalBuffer = ArrayPool<Complex>.Shared.Rent(DrawingProperties.DataBufferLength);
+        _signalMemoryHandle = new Memory<Complex>(_signalBuffer, 0, DrawingProperties.DataBufferLength);
     }
 
     public override void UpdateDrawingProperties(FFTRepresentationProperties properties)
     {
+        _bitmapPool.Return(_bitmapBuffer);
+        ArrayPool<Complex>.Shared.Return(_signalBuffer);
         
+        InitBuffers();
+    }
+    
+    public override void Dispose()
+    {
+        _bitmapPool.Return(_bitmapBuffer);
+        ArrayPool<Complex>.Shared.Return(_signalBuffer);
     }
 
     public override void BuildRepresentation(ReadOnlySpan<Complex> data)
     {
         if (data.Length != _signalMemoryHandle.Length)
-        {
             throw new NotImplementedException("Implement resize");
-        }
         
         //todo: probably this is redundant copy
         data.CopyTo(_signalMemoryHandle.Span);
@@ -85,13 +97,22 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
     // public void UpdateData(Bitmap bitmap, ReadOnlySpan<Point> pixels) // length = w*h*4 (premul)
     // {
     //     for (int i = 0; i < pixels.Length; i++)
+   
+
     //     {
+
     //         if (pixels[i].X < 0 || pixels[i].X >= bitmap.Width || pixels[i].Y < 0 || pixels[i].Y >= bitmap.Height)
+
     //             continue;
+
     //         
+
     //         bitmap.SetPixel((int)pixels[i].X, (int)pixels[i].Y, Color.Blue);
+
     //     }        
+
     // }
+
 
     public override ReadOnlySpan<byte> CurrentFrame => _bitmapMemoryHandle.Span;
 
@@ -117,10 +138,5 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
     protected override void HandleDrawingPropertiesUpdated()
     {
         throw new NotImplementedException();
-    }
-
-    public override void Dispose()
-    {
-        
     }
 }

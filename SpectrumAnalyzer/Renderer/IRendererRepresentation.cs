@@ -28,11 +28,9 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
     private protected byte[] _bitmapBuffer;
     private protected TData[] _signalBuffer;
     private TDrawingProperties _drawingProperties;
-    protected readonly int _singleBufferLength;
 
-    protected RendererRepresentationAbstract([DisallowNull] TDrawingProperties drawingProperties, int singleBufferLength)
+    protected RendererRepresentationAbstract([DisallowNull] TDrawingProperties drawingProperties)
     {
-        _singleBufferLength = singleBufferLength;
         _drawingProperties = drawingProperties ?? throw new ArgumentNullException(nameof(drawingProperties));
     }
 

@@ -5,7 +5,7 @@ namespace SpectrumAnalyzer.Renderer;
 
 public class WaterfallRepresentation : RendererRepresentationAbstract<WaterfallRepresentation, Complex>
 {
-    public WaterfallRepresentation(int singleBufferLength) : base(null, singleBufferLength)
+    public WaterfallRepresentation(int singleBufferLength) : base(null)
     {
     }
 

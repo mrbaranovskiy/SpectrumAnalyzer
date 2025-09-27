@@ -3,6 +3,7 @@
 namespace SpectrumAnalyzer.Renderer;
 
 public record FFTRepresentationProperties(
+    int DataBufferLength,
     int Width,
     int Height,
     int Bandwidth,

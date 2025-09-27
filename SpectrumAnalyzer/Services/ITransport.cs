@@ -26,6 +26,7 @@ public interface ITransport<T>
     int ReceivingChunkSize { get; set; }
     Task Start();
     Task Stop();
+    static int DefaultChunkSize { get; } = 1 << 12;
 }
 
 // var device = Device.UHD.GetDevice();

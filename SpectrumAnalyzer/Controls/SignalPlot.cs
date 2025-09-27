@@ -12,20 +12,19 @@ namespace SpectrumAnalyzer.Controls;
 
 public class SignalPlot : TemplatedControl
 {
-    private WriteableBitmap _bitmap;
 
     public SignalPlot()
     {
         SizeChanged+= (sender, args) =>
         {
             if (sender is TemplatedControl ctrl)
-                _bitmap = CreateBitmap(ctrl);
+                Source = CreateBitmap(ctrl);
         };
 
         Loaded += (sender, args) =>
         {
             if (sender is TemplatedControl ctrl)
-                _bitmap = CreateBitmap(ctrl);
+                Source = CreateBitmap(ctrl);
         };
     }
 
@@ -44,8 +43,8 @@ public class SignalPlot : TemplatedControl
 
     // Bottom layer: bind your WriteableBitmap (or any IBitmap)
     //
-    // public static readonly StyledProperty<WriteableBitmap?> SourceProperty =
-    //     AvaloniaProperty.Register<SignalPlot, WriteableBitmap?>(nameof(Source));
+    public static readonly StyledProperty<WriteableBitmap?> SourceProperty =
+        AvaloniaProperty.Register<SignalPlot, WriteableBitmap?>(nameof(Source));
 
     // Axes range for labels (overlay doesn’t care about how you draw pixels)
 
@@ -101,11 +100,11 @@ public class SignalPlot : TemplatedControl
     }
     
     //
-    // public WriteableBitmap? Source
-    // {
-    //     get => GetValue(SourceProperty);
-    //     set => SetValue(SourceProperty, value);
-    // }
+    public WriteableBitmap? Source
+    {
+        get => GetValue(SourceProperty);
+        set => SetValue(SourceProperty, value);
+    }
 
     public double MinX { get => GetValue(MinXProperty); set => SetValue(MinXProperty, value); }
     public double MaxX { get => GetValue(MaxXProperty); set => SetValue(MaxXProperty, value); }
@@ -126,7 +125,7 @@ public class SignalPlot : TemplatedControl
 
     public override void Render(DrawingContext context)
     {
-        if(Representation is null || _bitmap is null)
+        if(Representation is null || Source is null)
             return;
 
         // var frame = Representation.CurrentFrame;
@@ -135,12 +134,12 @@ public class SignalPlot : TemplatedControl
         var src = new Rect(0, 0, Width, Height);
         var dst = new Rect(Bounds.Size);
         
-        context.DrawImage(_bitmap, src, dst);
+        context.DrawImage(Source, src, dst);
     }
     
     public unsafe void UpdateData(ReadOnlySpan<byte> bgra) // length = w*h*4 (premul)
     {
-        using var fb = _bitmap.Lock();            // ILockedFramebuffer
+        using var fb = Source.Lock();            // ILockedFramebuffer
         var dst = new Span<byte>((void*)fb.Address, fb.RowBytes * fb.Size.Height);
         
 

@@ -25,6 +25,7 @@ public class StreamingPoolTests
         await Task.Delay(500);
 
         var props = new FFTRepresentationProperties(
+            ITransport<Complex>.DefaultChunkSize,
             Width: 1000,
             Height: 300,
             Bandwidth: 10000,
@@ -35,7 +36,8 @@ public class StreamingPoolTests
             XScaleFrequency: 10e3
         );
         var render = new ComplexDataRenderer(sdp);
-        var representation = new FftRepresentation(props, transport.ReceivingChunkSize);
+        props = props with { DataBufferLength = transport.ReceivingChunkSize };
+        var representation = new FftRepresentation(props);
         render.AddRepresentation(representation);
         render.Render();
 

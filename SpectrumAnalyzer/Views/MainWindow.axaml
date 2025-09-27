@@ -15,9 +15,9 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <Grid ClipToBounds="True">
-                        <!-- <Image Source="{TemplateBinding Source}" -->
-                        <!--        Stretch="Fill" -->
-                        <!--        IsHitTestVisible="False" /> -->
+                        <Image Source="{TemplateBinding Source}"
+                               Stretch="Fill"
+                               IsHitTestVisible="False" />
                         <global:SignalPlotOverlay
                             MinX="{TemplateBinding MinX}"
                             MaxX="{TemplateBinding MaxX}"
@@ -42,11 +42,12 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-
-    <Grid Width="800" Height="310">
+    <Grid Width="800" Height="320">
         <global:SignalPlot
-            MinX="0" MaxX="10"
-            MinY="-1" MaxY="1"
+            MinX="{Binding MinFrequencyAxis}"
+            MaxX="{Binding MaxFrequencyAxis}"
+            MinY="{Binding MinMagnitudeDbAxis}" MaxY="{Binding MaxMagnitudeDbAxis}"
+            
             GridDivisionsX="10" GridDivisionsY="8"
             GridBrush="#404040" AxisBrush="#E0E0E0"
             GridThickness="1" AxisThickness="1.5"

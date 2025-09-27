@@ -23,7 +23,7 @@ public struct AxisRange
 
     public AxisRange(double min, double max)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(min, max);
+        //ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(min, max);
         
         Min = min;
         Max = max;
