@@ -106,9 +106,10 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
 
         // var cnt = _bitmapMemoryHandle.Span.ToArray().Count(s => s > 0);
         
-        ArrayPool<Point>.Shared.Return(screenPoints); 
-        ArrayPool<double>.Shared.Return(resampledPower);
-        ArrayPool<double>.Shared.Return(resampledFreq);
+        
+        ArrayPool<Point>.Shared.Return(screenPoints, true); 
+        ArrayPool<double>.Shared.Return(resampledPower, true);
+        ArrayPool<double>.Shared.Return(resampledFreq, true);
     }
     
     // public void UpdateData(Bitmap bitmap, ReadOnlySpan<Point> pixels) // length = w*h*4 (premul)

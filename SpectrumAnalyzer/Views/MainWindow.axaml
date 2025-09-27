@@ -51,7 +51,7 @@
             <RowDefinition Height="10*"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
-        <global:SignalPlot
+        <global:SignalPlot x:Name="SignalPlotChart"
                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                            MinX="{Binding MinFrequencyAxis}"
                            MaxX="{Binding MaxFrequencyAxis}"

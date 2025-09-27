@@ -93,6 +93,7 @@ public class UHDTransport : ITransport<Complex>
                 /// todo: some prebuffereing.
                 /// 
 
+                _memory.Span.Clear();
                 var temp = new double[_memory.Span.Length];
 
                 for (int i = 0; i < 10; i++)

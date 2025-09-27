@@ -53,7 +53,7 @@ public sealed class StreamingIQPool : IStreamingDataPool<Complex>
             throw new InvalidOperationException("Buffers lenghts do not match");
         data.CopyTo(buffer);
         
-        _pool.Return(data);
+        _pool.Return(data, true);
 
         return false;
     }
@@ -72,7 +72,7 @@ public sealed class StreamingIQPool : IStreamingDataPool<Complex>
     public void ReleaseLatestData()
     {
         if (_queue.TryDequeue(out var buffer))
-            _pool.Return(buffer);
+            _pool.Return(buffer, true);
     }
 
     public void Dispose()
@@ -80,7 +80,7 @@ public sealed class StreamingIQPool : IStreamingDataPool<Complex>
         while (!_queue.IsEmpty)
         {
             _queue.TryDequeue(out var data);
-            _pool.Return(data);
+            _pool.Return(data, true);
         }
     }
 

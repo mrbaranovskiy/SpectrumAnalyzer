@@ -180,7 +180,7 @@ public class SignalPlot : TemplatedControl
     {
         using var fb = Source.Lock();            // ILockedFramebuffer
         var dst = new Span<byte>((void*)fb.Address, fb.RowBytes * fb.Size.Height);
-        
+        dst.Clear();
         
         var srcStride = (int)Width * 4;
         if (fb.RowBytes == srcStride)

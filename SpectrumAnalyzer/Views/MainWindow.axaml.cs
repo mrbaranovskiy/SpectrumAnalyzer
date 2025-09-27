@@ -13,6 +13,7 @@ namespace SpectrumAnalyzer.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly DispatcherTimer _timer;
     // private readonly DispatcherTimer _timer;
     // private readonly WaterfallControl? _ctrl;
     // private double _timeDelta = 0.05;
@@ -22,6 +23,7 @@ public partial class MainWindow : Window
     // private readonly Memory<double> _displayPointsPool;
     // private readonly Memory<byte> _bitmapDataPool;
     // private readonly BitmapGraphics _graphUtils;
+    
 
     public MainWindow()
     {
@@ -32,14 +34,21 @@ public partial class MainWindow : Window
         // _displayPointsPool = new Memory<double>(displayPoint, 0, NumberOfDisplayPoint);
         //
          InitializeComponent();
-         
-        //
-        // _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(50), DispatcherPriority.Normal, HandleDispatcherTimerCallback);
-        // _ctrl = this.FindControl<WaterfallControl>("waterfall");
-        // _graphUtils = BitmapGraphics.CreateGraphics(_ctrl.WidthPx, _ctrl.HeightPx, 1.0);
-        //
-        // var btmPool = ArrayPool<byte>.Shared.Rent(_ctrl.WidthPx * _ctrl.HeightPx * 4);
-        // _bitmapDataPool = new Memory<byte>(btmPool, 0, _ctrl.WidthPx * _ctrl.HeightPx * 4);
+
+         _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(50), DispatcherPriority.Render,
+             (sender, args) =>
+             {
+                 this.SignalPlotChart.InvalidateVisual();
+             });
+
+
+         //
+         // _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(50), DispatcherPriority.Normal, HandleDispatcherTimerCallback);
+         // _ctrl = this.FindControl<WaterfallControl>("waterfall");
+         // _graphUtils = BitmapGraphics.CreateGraphics(_ctrl.WidthPx, _ctrl.HeightPx, 1.0);
+         //
+         // var btmPool = ArrayPool<byte>.Shared.Rent(_ctrl.WidthPx * _ctrl.HeightPx * 4);
+         // _bitmapDataPool = new Memory<byte>(btmPool, 0, _ctrl.WidthPx * _ctrl.HeightPx * 4);
     }
 
     // private void HandleDispatcherTimerCallback(object? sender, EventArgs e)
