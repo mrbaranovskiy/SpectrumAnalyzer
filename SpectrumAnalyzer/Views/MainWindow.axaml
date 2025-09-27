@@ -7,21 +7,57 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="SpectrumAnalyzer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico" Background="Blue"
+        Icon="/Assets/avalonia-logo.ico"
         Title="SpectrumAnalyzer">
+    
+    <Window.Styles>
+        <Style Selector="global|SignalPlot">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Grid ClipToBounds="True">
+                        <!-- <Image Source="{TemplateBinding Source}" -->
+                        <!--        Stretch="Fill" -->
+                        <!--        IsHitTestVisible="False" /> -->
+                        <global:SignalPlotOverlay
+                            MinX="{TemplateBinding MinX}"
+                            MaxX="{TemplateBinding MaxX}"
+                            MinY="{TemplateBinding MinY}"
+                            MaxY="{TemplateBinding MaxY}"
+                            GridDivisionsX="{TemplateBinding GridDivisionsX}"
+                            GridDivisionsY="{TemplateBinding GridDivisionsY}"
+                            GridBrush="{TemplateBinding GridBrush}"
+                            GridThickness="{TemplateBinding GridThickness}"
+                            AxisBrush="{TemplateBinding AxisBrush}"
+                            AxisThickness="{TemplateBinding AxisThickness}"
+                            LabelBrush="{TemplateBinding LabelBrush}"
+                            PlotPadding="{TemplateBinding PlotPadding}"
+                            IsHitTestVisible="False" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </Window.Styles>
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    
-    <StackPanel Width="1000" Height="500">
-        <global:WaterfallControl Name="waterfall"
-                                 Width="{Binding $parent.Width}"
-                                 Height="{Binding $parent.Height}"
-        />
-    </StackPanel>
+
+    <Grid Width="800" Height="310">
+        <global:SignalPlot
+            MinX="0" MaxX="10"
+            MinY="-1" MaxY="1"
+            GridDivisionsX="10" GridDivisionsY="8"
+            GridBrush="#404040" AxisBrush="#E0E0E0"
+            GridThickness="1" AxisThickness="1.5"
+            PlotPadding="40,16,16,28"
+            Width="800" Height="300" />
+    </Grid>
+    <!-- <StackPanel Width="1000" Height="500"> -->
+    <!--     <global:WaterfallControl Name="waterfall" -->
+    <!--                              Width="{Binding $parent.Width}" -->
+    <!--                              Height="{Binding $parent.Height}" -->
+    <!--     /> -->
+    <!-- </StackPanel> -->
 
 </Window>

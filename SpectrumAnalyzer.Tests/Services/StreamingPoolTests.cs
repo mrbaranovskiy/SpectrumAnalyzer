@@ -15,7 +15,7 @@ public class StreamingPoolTests
     {
         var moq = new Mock<IDeviceNativeApi<float>>();
         using ITransport<Complex> transport = new UHDTransport(moq.Object);
-        var sdp = new StreamingDataPool(transport);
+        var sdp = new StreamingIQPool(transport);
         var messagesCount = 0;
         sdp.DataReceived += (sender, args) =>
         {

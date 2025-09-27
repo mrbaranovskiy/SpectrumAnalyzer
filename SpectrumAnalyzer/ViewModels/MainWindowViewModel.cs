@@ -1,26 +1,57 @@
 ﻿using System;
+using System.Numerics;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.Input;
+using ReactiveUI;
+using SpectrumAnalyzer.Renderer;
+using SpectrumAnalyzer.Services;
 
 namespace SpectrumAnalyzer.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase, IDisposable
+public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    private readonly DispatcherTimer _timer;
-
-    public MainWindowViewModel()
+    private readonly IDeviceConnection<Complex, UsprConnectionProperties> _usrpConnection;
+    private int _sampleRate;
+    private double _bandwidth;
+    private double _centerFrequency;
+    private IStreamingDataPool<Complex> _streamingPool;
+    public MainWindowViewModel(IDeviceConnection<Complex, UsprConnectionProperties> usrpConnection)
     {
-        //_timer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, HandleDispatcherTimerCallback);
+        _usrpConnection = usrpConnection;
+        //_streamingPool = new StreamingIQPool();
     }
 
-    private static void HandleDispatcherTimerCallback(object sender, EventArgs e)
+    [RelayCommand]
+    public async Task StartReceiving()
     {
         
     }
-    
-    public string Greeting => "Welcome to Avalonia!";
+
+    public int SampleRate
+    {
+        get => _sampleRate;
+        set
+        {
+            _sampleRate = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    public double Bandwidth
+    {
+        get => _bandwidth;
+        set => this.RaiseAndSetIfChanged(ref _bandwidth, value);
+    }
+
+    public double CenterFrequency
+    {
+        get => _centerFrequency;
+        set => this.RaiseAndSetIfChanged(ref _centerFrequency, value);
+    }
 
     public void Dispose()
     {
-        _timer.Stop();
     }
 }
