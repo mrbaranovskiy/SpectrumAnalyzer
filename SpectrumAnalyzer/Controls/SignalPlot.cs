@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Drawing;
 using System.Numerics;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using SpectrumAnalyzer.Renderer;
 using SpectrumAnalyzer.Services;
+using SpectrumAnalyzer.Utilities;
+using Brushes = Avalonia.Media.Brushes;
+using Point = Avalonia.Point;
 using Vector = Avalonia.Vector;
 
 namespace SpectrumAnalyzer.Controls;
@@ -68,25 +73,22 @@ public class SignalPlot : TemplatedControl
         set => SetAndRaise(ViewportHeightProperty, ref _viewportHeight, value);
     }
 
-
-    private IDataReady _renderSource;
-
-    public static readonly DirectProperty<SignalPlot, IDataReady> RenderSourceProperty = AvaloniaProperty.RegisterDirect<SignalPlot, IDataReady>(
-        nameof(RenderSource), o => o.RenderSource, setter: (o, v) =>
-        {
-            o.RenderSource = v;
-        });
-
-    public IDataReady RenderSource
-    {
-        get => _renderSource;
-        set => SetAndRaise(RenderSourceProperty, ref _renderSource, value);
-    }
-
     // Bottom layer: bind your WriteableBitmap (or any IBitmap)
     //
-    public static readonly StyledProperty<WriteableBitmap?> SourceProperty =
-        AvaloniaProperty.Register<SignalPlot, WriteableBitmap?>(nameof(Source));
+    // public static readonly StyledProperty<WriteableBitmap?> SourceProperty =
+    //     AvaloniaProperty.Register<SignalPlot, WriteableBitmap?>(nameof(Source));
+
+    private WriteableBitmap _source;
+    
+
+    public static readonly DirectProperty<SignalPlot, WriteableBitmap> SourceProperty = AvaloniaProperty.RegisterDirect<SignalPlot, WriteableBitmap>(
+        nameof(Source), o => o.Source, (o, v) => o.Source = v);
+
+    public WriteableBitmap Source
+    {
+        get => _source;
+        set => SetAndRaise(SourceProperty, ref _source, value);
+    }
 
     // Axes range for labels (overlay doesn’t care about how you draw pixels)
     
@@ -140,11 +142,11 @@ public class SignalPlot : TemplatedControl
         set => SetValue(RepresentationProperty, value);
     }
     //
-    public WriteableBitmap? Source
-    {
-        get => GetValue(SourceProperty);
-        set => SetValue(SourceProperty, value);
-    }
+    // public WriteableBitmap? Source
+    // {
+    //     get => GetValue(SourceProperty);
+    //     set => SetValue(SourceProperty, value);
+    // }
 
     public double MinX { get => GetValue(MinXProperty); set => SetValue(MinXProperty, value); }
     public double MaxX { get => GetValue(MaxXProperty); set => SetValue(MaxXProperty, value); }
@@ -165,7 +167,7 @@ public class SignalPlot : TemplatedControl
 
     public override void Render(DrawingContext context)
     {
-        if(Representation is null || Source is null)
+        if(Source is null)
             return;
         
         UpdateData(Representation.CurrentFrame);
@@ -174,6 +176,8 @@ public class SignalPlot : TemplatedControl
         var dst = new Rect(Bounds.Size);
         
         context.DrawImage(Source, src, dst);
+        IPen pen = new Avalonia.Media.Pen(Brushes.Brown, 3.0);
+        context.DrawLine(pen, new Point(0,0), new Point(Width,Height));
     }
     
     public unsafe void UpdateData(ReadOnlySpan<byte> bgra) // length = w*h*4 (premul)
@@ -196,8 +200,6 @@ public class SignalPlot : TemplatedControl
                     .CopyTo(dst.Slice(y * fb.RowBytes, srcStride));
             }
         }
-
-        //InvalidateVisual();                      // ask Avalonia to redraw us
     }
 }
 

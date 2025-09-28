@@ -20,8 +20,6 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
 
     private void InitBuffers()
     {
-        
-        
         _bitmapGraphics = BitmapGraphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
         
         var windowSize = DrawingProperties.Height * DrawingProperties.Width * 4;

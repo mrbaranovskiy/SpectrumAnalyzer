@@ -1,10 +1,14 @@
 using System;
 using System.Buffers;
+using System.Linq;
 using System.Numerics;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Diagnostics;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using SpectrumAnalyzer.Controls;
 using SpectrumAnalyzer.Utilities;
 using SpectrumAnalyzer.ViewModels;
@@ -35,10 +39,27 @@ public partial class MainWindow : Window
         //
          InitializeComponent();
 
+         bool sub = false;
          _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(50), DispatcherPriority.Render,
              (sender, args) =>
              {
-                 this.SignalPlotChart.InvalidateVisual();
+                 
+                 var image =  this.GetVisualDescendants().OfType<Image>().FirstOrDefault();
+                
+                 if (image != null)
+                 {
+                     
+                     if (image.Source is WriteableBitmap b)
+                     {
+                         if (image.Source == SignalPlotChart.Source)
+                         {
+                             Console.WriteLine("Test");
+                         }
+                     }
+                     
+                     //image.Source = this.SignalPlotChart.Source;
+                     this.SignalPlotChart.InvalidateVisual();
+                 }
              });
 
 

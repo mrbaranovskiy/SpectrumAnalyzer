@@ -11,22 +11,28 @@ namespace SpectrumAnalyzer.Services;
 public class UsrpTransport : ITransport<Complex>
 {
     private readonly IDeviceNativeApi<float> _api;
+    private readonly UsrpConnectionProperties _connectionProps;
     private Task _readTask;
     private readonly CancellationTokenSource _cts = new();
-    private Memory<Complex> _memory;
+    private Memory<Complex> _memoryComplex;
     public event EventHandler<DataReceivedEventArgs>? DataReceived;
     private static readonly object Lock = new();
-    private double _time; //temporary used for signal generation,
     private Complex[] _bufferComplex;
     private float[] _bufferFloat;
     private int _receivingChunkSize = 1 << 12;
+    private readonly Memory<float> _memoryFloat;
 
-    public UsrpTransport(IDeviceNativeApi<float> api)
+    public UsrpTransport(
+        IDeviceNativeApi<float> api,
+        UsrpConnectionProperties connectionProps)
     {
         _readTask = Task.CompletedTask;
         _api = api;
+        _connectionProps = connectionProps;
         _bufferComplex = new Complex[ReceivingChunkSize];
-        _bufferFloat = new float[ReceivingChunkSize];
+        _memoryComplex = new Memory<Complex>(_bufferComplex);
+        _bufferFloat = new float[2*ReceivingChunkSize];
+        _memoryFloat = new Memory<float>(_bufferFloat);
     }
 
     public bool IsStreaming => _readTask.Status == TaskStatus.Running;
@@ -36,7 +42,7 @@ public class UsrpTransport : ITransport<Complex>
     public ReadOnlySpan<Complex> GetRawData()
     {
         lock (Lock)
-            return _memory.Span;
+            return _memoryComplex.Span;
     }
 
     public int ReceivingChunkSize
@@ -51,13 +57,26 @@ public class UsrpTransport : ITransport<Complex>
 
     public Task Start()
     {
-        _readTask = Task.Run(ReadingLoop);
-        return _readTask;
+        //_api.Open();
+        return Restart();
     }
 
     public Task Stop()
     {
         return _cts.CancelAsync();
+    }
+
+    public Task Restart()
+    {
+        var fr = _connectionProps.CenterFrequencyHz;
+        var sr = _connectionProps.SampleRateHz;
+        var gain = _connectionProps.GainDb;
+        var bw = _connectionProps.BandwidthHz;
+        
+        // _api.ConfigureRx(fr,sr,  gain, bw);
+        // _api.PrepareStream(0);
+        _readTask = Task.Run(ReadingLoop);
+        return _readTask;
     }
 
     protected virtual void OnDataReceived(DataReceivedEventArgs e)
@@ -69,12 +88,13 @@ public class UsrpTransport : ITransport<Complex>
     {
         lock (Lock)
         {
-            _pool.Return(_bufferComplex, true);
-            _pool = ArrayPool<Complex>.Shared;
-            _bufferComplex = _pool.Rent(_receivingChunkSize);
-            _memory = new Memory<Complex>(_bufferComplex, 0, _receivingChunkSize);
+            _bufferComplex = new Complex[_receivingChunkSize];
+            _bufferFloat = new float[2 * _receivingChunkSize];
+            _memoryComplex = new Memory<Complex>(_bufferComplex);
         }
     }
+    
+    int accumulator = 0;
     
     private void ReadingLoop()
     {
@@ -85,28 +105,28 @@ public class UsrpTransport : ITransport<Complex>
             {
                 // this is bad. No good control for the data.
                 // data can be lost. 
-                /// todo: some prebuffereing.
-                /// 
+                _memoryComplex.Span.Clear();
+                _memoryFloat.Span.Clear();
+                //_api.Receive(_bufferFloat, ReceivingChunkSize, out var bytesRead);
+                var bytesRead = _bufferFloat.Length;
+                var temp = new double[_bufferFloat.Length];
+                FftSharp.SampleData.AddSin(temp, (int) _connectionProps.SampleRateHz, accumulator+=2000, 0.03);
 
-                _memory.Span.Clear();
+                for (int i = 0; i < bytesRead; i+=2)
+                {
+                    _bufferComplex[i / 2] = new Complex(temp[i],0.1);
+                }
                 
-                _api.Receive()
-
-                for (int i = 0; i < _memory.Span.Length; i++) _memory.Span[i] += temp[i];
-
+                Thread.Sleep(100);
                 LastDataReceived = DateTime.UtcNow;
-                OnDataReceived(new DataReceivedEventArgs(_memory.Span.Length, DateTime.UtcNow.ToFileTimeUtc()));
+                OnDataReceived(new DataReceivedEventArgs(bytesRead, DateTime.UtcNow.ToFileTimeUtc()));
             }
-            
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
         }
     }
     
     public void Dispose()
     {
         _cts.Cancel();
-        _pool.Return(_bufferComplex);
-        //todo:
-        //dispose native api.
+        _api.Dispose();
     }
 }

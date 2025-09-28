@@ -15,12 +15,11 @@
         <Style Selector="global|SignalPlot">
             <Setter Property="Template">
                 <ControlTemplate>
-                    <Grid ClipToBounds="True">
+                    <Grid x:Name="GridTest" ClipToBounds="True">
                         
                         <!-- This is our rendering viewport -->
-                        <Image Source="{TemplateBinding Source}"
-                               Stretch="Fill"
-                               IsHitTestVisible="False" />
+                        <Image x:Name="ImageTest" Source="{TemplateBinding Source, Mode=TwoWay}"
+                               IsHitTestVisible="True" />
                         
                         <global:SignalPlotOverlay
                             MinX="{TemplateBinding MinX}"
@@ -64,7 +63,6 @@
                            PlotPadding="40,16,16,28"
                            Height="{Binding #wnd.Height}"
                            Width="{Binding #wnd.Width}"
-                           RenderSource="{Binding Renderer, Mode=OneWay}"
                            ViewportHeight="{Binding FftCtrlHeight, Mode=OneWayToSource}"
                            ViewportWidth="{Binding FftCtrlWidth, Mode=OneWayToSource}"
         />

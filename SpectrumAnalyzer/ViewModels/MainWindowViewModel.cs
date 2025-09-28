@@ -46,21 +46,22 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             100,
             100,
             Bandwidth,
-            CenterFrequency, SamplingRate,
-            new AxisRange(-400, 50),
+            CenterFrequency
+            , SamplingRate,
+            new AxisRange(-120, 30),
             new AxisRange(0, Bandwidth));
         
         _fftRepresentation = new FftRepresentation(_fftProperties);
 
         MinMagnitudeDbAxis = -120;
         MaxMagnitudeDbAxis = 30;
-        Bandwidth = 10000;
+        Bandwidth = 2_000_000;
         MinFrequencyAxis = 0;
         MaxFrequencyAxis = Bandwidth * 2;
         FftCtrlWidth = 800;
         FftCtrlHeight = 300;
-        SamplingRate = 32000;
-        CenterFrequency = 10000;
+        SamplingRate = Bandwidth / 2;
+        CenterFrequency = 433_000_000;
         
         _representations.Add(_fftRepresentation);
     }
@@ -78,11 +79,13 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             Antenna = "TX/RX",
             BandwidthHz = Bandwidth,
             CenterFrequencyHz = CenterFrequency,
-            GainDb = 50,
+            GainDb = 20,
             SampleRateHz = SamplingRate
         };
 
-        _transport = _usrpConnection.ConnectToDevice(connectionProps);
+        
+        _transport = _usrpConnection.BuildConnection(connectionProps);
+        _transport.ReceivingChunkSize = ITransport<Complex>.DefaultChunkSize;
             
         _streamingPool = new StreamingIQPool(_transport);
         Renderer = new ComplexDataRenderer(_streamingPool);

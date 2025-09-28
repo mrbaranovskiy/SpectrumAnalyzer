@@ -2,19 +2,19 @@
 
 public interface IConnectionProperties
 {
-    int CenterFrequencyHz { get; }
-    int BandwidthHz { get; }
-    int GainDb { get; }
+    double CenterFrequencyHz { get; }
+    double BandwidthHz { get; }
+    double GainDb { get; }
     string Antenna { get; }
-    int SampleRateHz { get; }
+    double SampleRateHz { get; }
 }
 
 public record struct UsrpConnectionProperties(
-    int CenterFrequencyHz,
-    int BandwidthHz,
-    int GainDb,
+    double CenterFrequencyHz,
+    double BandwidthHz,
+    double GainDb,
     string Antenna,
-    int SampleRateHz)
+    double SampleRateHz)
     : IConnectionProperties;
 
 public static class UsrpConnectionPropertiesExtensions
