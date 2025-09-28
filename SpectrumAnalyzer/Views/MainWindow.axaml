@@ -18,8 +18,8 @@
                     <Grid x:Name="GridTest" ClipToBounds="True">
                         
                         <!-- This is our rendering viewport -->
-                        <Image x:Name="ImageTest" Source="{TemplateBinding Source, Mode=TwoWay}"
-                               IsHitTestVisible="True" />
+                        <!-- <Image x:Name="ImageTest" Source="{TemplateBinding Source, Mode=TwoWay}" -->
+                        <!--        IsHitTestVisible="True" /> -->
                         
                         <global:SignalPlotOverlay
                             MinX="{TemplateBinding MinX}"

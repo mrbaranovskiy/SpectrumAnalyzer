@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media;
 
@@ -72,5 +73,23 @@ public sealed class BitmapGraphics
            
             DrawLine(image, p1, p2, color.ToUInt32());
         }
+    }
+    
+    public void DrawLines(Memory<byte> image, ReadOnlyMemory<Point> points, Color color)
+    {
+        Parallel.For(1, points.Length, i =>
+        {
+            var p1 = points.Span[i - 1];
+            var p2 = points.Span[i];
+            DrawLine(image.Span, p1, p2, color.ToUInt32());
+        });
+        
+        // for (var i = 1; i < points.Length; i++)
+        // {
+        //     var p1 = points[i - 1];
+        //     var p2 = points[i];
+        //    
+        //     DrawLine(image, p1, p2, color.ToUInt32());
+        // }
     }
 }

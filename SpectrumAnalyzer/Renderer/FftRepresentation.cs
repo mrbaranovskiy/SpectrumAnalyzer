@@ -21,7 +21,6 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
     private void InitBuffers()
     {
         _bitmapGraphics = BitmapGraphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
-        
         var windowSize = DrawingProperties.Height * DrawingProperties.Width * 4;
         
         _bitmapPool = ArrayPool<byte>.Create(windowSize, 1);
@@ -67,6 +66,7 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         
         //todo: probably this is redundant copy
         data.CopyTo(_signalMemoryHandle.Span);
+        _bitmapMemoryHandle.Span.Clear();
 
         // FftSharp.Windows.Rectangular rw = new Rectangular();
         FftSharp.FFT.Forward(_signalMemoryHandle.Span);
@@ -76,13 +76,14 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
 
         var wndSize = DrawingProperties.Height * DrawingProperties.Width * 4;
         var screenPoints = ArrayPool<Point>.Shared.Rent(wndSize);
-        var screenPointsMem = new Memory<Point>(screenPoints, 0, wndSize);
+     
         
         //todo: need to decide how many points to draw on the screen. 
         //there is no much sense to draw them all.
         // temporary I took 3 screen width. 
         // Mayne some Shannon theorem to avoid signal lost.
-        int numberOfDrawedPoints = _signalBuffer.Length / 2;
+        int numberOfDrawedPoints =  Math.Max(_signalBuffer.Length / 2, 1024);
+        var screenPointsMem = new Memory<Point>(screenPoints, 0, numberOfDrawedPoints);
 
         var resampledPower = ArrayPool<double>.Shared.Rent(numberOfDrawedPoints);
         var resPowerMem = new Memory<double>(resampledPower, 0, numberOfDrawedPoints);
@@ -97,38 +98,13 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         
         GeneratePoints(screenPointsMem.Span, ys, xs );
         
-        _bitmapGraphics.DrawLines(_bitmapMemoryHandle.Span, screenPointsMem.Span, Colors.White);
-        //var btm = new Bitmap(DrawingProperties.Width, DrawingProperties.Height, PixelFormat.Format32bppRgb);
-        //UpdateData(btm, screenPointsMem.Span);
-        //btm.Save("D:\\fft.bmp");
-
-        // var cnt = _bitmapMemoryHandle.Span.ToArray().Count(s => s > 0);
-        
+        // _bitmapGraphics.DrawLines(_bitmapMemoryHandle.Span, screenPointsMem.Span, Colors.White);
+        _bitmapGraphics.DrawLines(_bitmapMemoryHandle, screenPointsMem, Colors.Green);
         
         ArrayPool<Point>.Shared.Return(screenPoints, true); 
         ArrayPool<double>.Shared.Return(resampledPower, true);
         ArrayPool<double>.Shared.Return(resampledFreq, true);
     }
-    
-    // public void UpdateData(Bitmap bitmap, ReadOnlySpan<Point> pixels) // length = w*h*4 (premul)
-    // {
-    //     for (int i = 0; i < pixels.Length; i++)
-   
-
-    //     {
-
-    //         if (pixels[i].X < 0 || pixels[i].X >= bitmap.Width || pixels[i].Y < 0 || pixels[i].Y >= bitmap.Height)
-
-    //             continue;
-
-    //         
-
-    //         bitmap.SetPixel((int)pixels[i].X, (int)pixels[i].Y, Color.Blue);
-
-    //     }        
-
-    // }
-
 
     public override ReadOnlySpan<byte> CurrentFrame => _bitmapMemoryHandle.Span;
 
@@ -144,7 +120,7 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
                 DrawingProperties.YAxisRange.Min,
                 DrawingProperties.YAxisRange.Max,
                 DrawingProperties.XAxisRange.Min,
-                DrawingProperties.XAxisRange.Max
+                DrawingProperties.SamplingRate / 2
             );
             
             output[i] = new Point(scaledPt.Item1, scaledPt.Item2);

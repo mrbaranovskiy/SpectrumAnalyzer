@@ -11,6 +11,7 @@ using SpectrumAnalyzer.Renderer;
 using SpectrumAnalyzer.Services;
 using SpectrumAnalyzer.Utilities;
 using Brushes = Avalonia.Media.Brushes;
+using Color = Avalonia.Media.Color;
 using Point = Avalonia.Point;
 using Vector = Avalonia.Vector;
 
@@ -26,7 +27,7 @@ public class SignalPlot : TemplatedControl
             ViewportWidth = (int)Width;
             
             if (sender is TemplatedControl {Height: > 0 , Width: > 0} ctrl)
-                Source = CreateBitmap(ctrl);
+                _source = CreateBitmap(ctrl);
         };
 
         Loaded += (sender, args) =>
@@ -36,7 +37,7 @@ public class SignalPlot : TemplatedControl
           
             
             if (sender is TemplatedControl {Height: > 0 , Width: > 0} ctrl )
-                Source = CreateBitmap(ctrl);
+                _source = CreateBitmap(ctrl);
         };
     }
 
@@ -81,14 +82,14 @@ public class SignalPlot : TemplatedControl
     private WriteableBitmap _source;
     
 
-    public static readonly DirectProperty<SignalPlot, WriteableBitmap> SourceProperty = AvaloniaProperty.RegisterDirect<SignalPlot, WriteableBitmap>(
-        nameof(Source), o => o.Source, (o, v) => o.Source = v);
-
-    public WriteableBitmap Source
-    {
-        get => _source;
-        set => SetAndRaise(SourceProperty, ref _source, value);
-    }
+    // public static readonly DirectProperty<SignalPlot, WriteableBitmap> SourceProperty = AvaloniaProperty.RegisterDirect<SignalPlot, WriteableBitmap>(
+    //     nameof(Source), o => o.Source, (o, v) => o.Source = v);
+    //
+    // public WriteableBitmap Source
+    // {
+    //     get => _source;
+    //     set => SetAndRaise(SourceProperty, ref _source, value);
+    // }
 
     // Axes range for labels (overlay doesn’t care about how you draw pixels)
     
@@ -164,25 +165,23 @@ public class SignalPlot : TemplatedControl
 
     public IBrush LabelBrush { get => GetValue(LabelBrushProperty); set => SetValue(LabelBrushProperty, value); }
     public Thickness PlotPadding { get => GetValue(PlotPaddingProperty); set => SetValue(PlotPaddingProperty, value); }
-
+    private int cnt = 0;
     public override void Render(DrawingContext context)
     {
-        if(Source is null)
+        if(_source is null)
             return;
         
+        //_source.FillSolid(Color.FromRgb(255, 255, 0));
         UpdateData(Representation.CurrentFrame);
-
-        var src = new Rect(0, 0, Width, Height);
+        var src = new Rect(-PlotPadding.Left,  PlotPadding.Bottom, Width - PlotPadding.Left, Height);
         var dst = new Rect(Bounds.Size);
         
-        context.DrawImage(Source, src, dst);
-        IPen pen = new Avalonia.Media.Pen(Brushes.Brown, 3.0);
-        context.DrawLine(pen, new Point(0,0), new Point(Width,Height));
+        context.DrawImage(_source, src, dst);
     }
     
     public unsafe void UpdateData(ReadOnlySpan<byte> bgra) // length = w*h*4 (premul)
     {
-        using var fb = Source.Lock();            // ILockedFramebuffer
+        using var fb = _source.Lock();            // ILockedFramebuffer
         var dst = new Span<byte>((void*)fb.Address, fb.RowBytes * fb.Size.Height);
         dst.Clear();
         

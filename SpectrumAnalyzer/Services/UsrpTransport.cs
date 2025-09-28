@@ -57,7 +57,7 @@ public class UsrpTransport : ITransport<Complex>
 
     public Task Start()
     {
-        //_api.Open();
+        _api.Open();
         return Restart();
     }
 
@@ -73,8 +73,8 @@ public class UsrpTransport : ITransport<Complex>
         var gain = _connectionProps.GainDb;
         var bw = _connectionProps.BandwidthHz;
         
-        // _api.ConfigureRx(fr,sr,  gain, bw);
-        // _api.PrepareStream(0);
+        _api.ConfigureRx(fr,sr,  gain, bw);
+        _api.PrepareStream(0);
         _readTask = Task.Run(ReadingLoop);
         return _readTask;
     }
@@ -94,7 +94,6 @@ public class UsrpTransport : ITransport<Complex>
         }
     }
     
-    int accumulator = 0;
     
     private void ReadingLoop()
     {
@@ -107,17 +106,16 @@ public class UsrpTransport : ITransport<Complex>
                 // data can be lost. 
                 _memoryComplex.Span.Clear();
                 _memoryFloat.Span.Clear();
-                //_api.Receive(_bufferFloat, ReceivingChunkSize, out var bytesRead);
-                var bytesRead = _bufferFloat.Length;
-                var temp = new double[_bufferFloat.Length];
-                FftSharp.SampleData.AddSin(temp, (int) _connectionProps.SampleRateHz, accumulator+=2000, 0.03);
+                _api.Receive(_bufferFloat, ReceivingChunkSize, out var bytesRead);
+                //var bytesRead = _bufferFloat.Length;
+                // var temp = new double[_bufferFloat.Length];
+                // FftSharp.SampleData.AddSin(temp, (int) _connectionProps.SampleRateHz, accumulator+=2000, 0.03);
 
                 for (int i = 0; i < bytesRead; i+=2)
                 {
-                    _bufferComplex[i / 2] = new Complex(temp[i],0.1);
+                    _bufferComplex[i / 2] = new Complex(_bufferFloat[i],_bufferFloat[i + 1]);
                 }
                 
-                Thread.Sleep(100);
                 LastDataReceived = DateTime.UtcNow;
                 OnDataReceived(new DataReceivedEventArgs(bytesRead, DateTime.UtcNow.ToFileTimeUtc()));
             }
