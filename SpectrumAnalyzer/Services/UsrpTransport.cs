@@ -13,27 +13,25 @@ public class UsrpTransport : ITransport<Complex>
     private readonly IDeviceNativeApi<float> _api;
     private Task _readTask;
     private readonly CancellationTokenSource _cts = new();
-    private ArrayPool<Complex> _pool;
     private Memory<Complex> _memory;
     public event EventHandler<DataReceivedEventArgs>? DataReceived;
     private static readonly object Lock = new();
     private double _time; //temporary used for signal generation,
-    private Complex[] _buffer;
+    private Complex[] _bufferComplex;
+    private float[] _bufferFloat;
     private int _receivingChunkSize = 1 << 12;
 
     public UsrpTransport(IDeviceNativeApi<float> api)
     {
         _readTask = Task.CompletedTask;
         _api = api;
-        //todo: resolve this mess with receiving size
-        _pool = ArrayPool<Complex>.Shared;
-        _buffer = _pool.Rent(ReceivingChunkSize);
-        _memory = new Memory<Complex>(_buffer, 0, ReceivingChunkSize);
+        _bufferComplex = new Complex[ReceivingChunkSize];
+        _bufferFloat = new float[ReceivingChunkSize];
     }
 
     public bool IsStreaming => _readTask.Status == TaskStatus.Running;
 
-    public DateTime LastDataReceived { get; }
+    public DateTime LastDataReceived { get; private set; }
 
     public ReadOnlySpan<Complex> GetRawData()
     {
@@ -71,10 +69,10 @@ public class UsrpTransport : ITransport<Complex>
     {
         lock (Lock)
         {
-            _pool.Return(_buffer, true);
+            _pool.Return(_bufferComplex, true);
             _pool = ArrayPool<Complex>.Shared;
-            _buffer = _pool.Rent(_receivingChunkSize);
-            _memory = new Memory<Complex>(_buffer, 0, _receivingChunkSize);
+            _bufferComplex = _pool.Rent(_receivingChunkSize);
+            _memory = new Memory<Complex>(_bufferComplex, 0, _receivingChunkSize);
         }
     }
     
@@ -91,15 +89,12 @@ public class UsrpTransport : ITransport<Complex>
                 /// 
 
                 _memory.Span.Clear();
-                var temp = new double[_memory.Span.Length];
-
-                for (int i = 0; i < 10; i++)
-                {
-                    FftSharp.SampleData.AddSin(temp, 32000, 10.34e3 + i * 13, 4);
-                }
+                
+                _api.Receive()
 
                 for (int i = 0; i < _memory.Span.Length; i++) _memory.Span[i] += temp[i];
-                
+
+                LastDataReceived = DateTime.UtcNow;
                 OnDataReceived(new DataReceivedEventArgs(_memory.Span.Length, DateTime.UtcNow.ToFileTimeUtc()));
             }
             
@@ -110,7 +105,7 @@ public class UsrpTransport : ITransport<Complex>
     public void Dispose()
     {
         _cts.Cancel();
-        _pool.Return(_buffer);
+        _pool.Return(_bufferComplex);
         //todo:
         //dispose native api.
     }

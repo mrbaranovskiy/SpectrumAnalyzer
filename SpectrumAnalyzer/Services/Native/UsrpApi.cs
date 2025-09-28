@@ -55,7 +55,6 @@ public class UsrpApi : IDeviceNativeApi<float>
 
     public int Receive(float[] buffer, int count ,out int bytesRead)
     {
-        
         bytesRead = 0;
         var err = UsrpNative.usrp_recv_once(_handle, buffer, (UIntPtr)count, 500, out var receivedCount);
         bytesRead = (int)receivedCount;

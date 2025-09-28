@@ -9,7 +9,7 @@ public interface IConnectionProperties
     int SampleRateHz { get; }
 }
 
-public record struct UsprConnectionProperties(
+public record struct UsrpConnectionProperties(
     int CenterFrequencyHz,
     int BandwidthHz,
     int GainDb,
@@ -17,11 +17,11 @@ public record struct UsprConnectionProperties(
     int SampleRateHz)
     : IConnectionProperties;
 
-public static class UsprConnectionPropertiesExtensions
+public static class UsrpConnectionPropertiesExtensions
 {
-    public static UsprConnectionProperties GenerateDefault()
+    public static UsrpConnectionProperties GenerateDefault()
     {
-        return new UsprConnectionProperties()
+        return new UsrpConnectionProperties()
         {
             CenterFrequencyHz = 110_000_000, 
             BandwidthHz = 1_000_000,

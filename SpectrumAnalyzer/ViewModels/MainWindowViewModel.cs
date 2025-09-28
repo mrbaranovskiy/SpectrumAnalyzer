@@ -13,7 +13,7 @@ namespace SpectrumAnalyzer.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    private readonly IDeviceConnection<Complex, UsprConnectionProperties> _usrpConnection;
+    private readonly IDeviceConnection<Complex, UsrpConnectionProperties> _usrpConnection;
     private int _samplingRate;
     private int _bandwidth;
     private int _centerFrequency;
@@ -37,7 +37,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private double _fftCtrlWidth;
     private double _fftCtrlHeight;
 
-    public MainWindowViewModel(IDeviceConnection<Complex, UsprConnectionProperties> usrpConnection)
+    public MainWindowViewModel(IDeviceConnection<Complex, UsrpConnectionProperties> usrpConnection)
     {
         _usrpConnection = usrpConnection;
         _representations = new List<IRendererRepresentation<Complex>>();
@@ -64,7 +64,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         
         _representations.Add(_fftRepresentation);
     }
-    
 
     [RelayCommand]
     public async Task StartReceiving()
@@ -74,7 +73,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         
         // it is stupid.... but i have no much time to 
         // implement different devices. Device manager and so on..
-        var connectionProps = new UsprConnectionProperties
+        var connectionProps = new UsrpConnectionProperties
         {
             Antenna = "TX/RX",
             BandwidthHz = Bandwidth,

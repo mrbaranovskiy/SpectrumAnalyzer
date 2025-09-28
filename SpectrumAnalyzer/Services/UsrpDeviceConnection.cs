@@ -5,9 +5,9 @@ using SpectrumAnalyzer.Services.Native;
 
 namespace SpectrumAnalyzer.Services;
 
-public class UsrpDeviceConnection : IDeviceConnection<Complex, UsprConnectionProperties>
+public class UsrpDeviceConnection : IDeviceConnection<Complex, UsrpConnectionProperties>
 {
-    public ITransport<Complex> ConnectToDevice(UsprConnectionProperties connectionProps)
+    public ITransport<Complex> ConnectToDevice(UsrpConnectionProperties connectionProps)
     {
         return new UsrpTransport(new UsrpApi());
     }

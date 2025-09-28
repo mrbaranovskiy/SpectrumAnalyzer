@@ -12,17 +12,17 @@ public interface ISDRDevice<TData, TConnectionProperties> : IDisposable
         ConnectAsync(TConnectionProperties connectionProperties);
 }
 
-public class UsprDevice : ISDRDevice<Complex, UsprConnectionProperties>
+public class UsrpDevice : ISDRDevice<Complex, UsrpConnectionProperties>
 {
     private readonly IDeviceNativeApi<float> _api;
 
-    public UsprDevice(IDeviceNativeApi<float> api)
+    public UsrpDevice(IDeviceNativeApi<float> api)
     {
         _api = api;
     }
     
-    public Task<IDeviceConnection<Complex, UsprConnectionProperties>>
-        ConnectAsync(UsprConnectionProperties connectionProperties)
+    public Task<IDeviceConnection<Complex, UsrpConnectionProperties>>
+        ConnectAsync(UsrpConnectionProperties connectionProperties)
     {
         throw new NotImplementedException();
     }

@@ -5,7 +5,8 @@ namespace SpectrumAnalyzer.Native;
 public static class UsrpNative
 {
     const string Lib = "libusrpc.so"; // ensure it can be found in LD_LIBRARY_PATH
-
+    
+    // [LibraryImport(Lib)] 
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
     public static extern int usrp_open(string args, out IntPtr handle);
 
@@ -40,7 +41,7 @@ public static class UsrpNative
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
     public static extern int usrp_recv_once(
         IntPtr handle,
-        float[] outIQ,    // interleaved I/Q
+        float[] outIq,    // interleaved I/Q
         UIntPtr nsamps,   // complex sample count
         int timeoutMs,
         out UIntPtr outReceived
