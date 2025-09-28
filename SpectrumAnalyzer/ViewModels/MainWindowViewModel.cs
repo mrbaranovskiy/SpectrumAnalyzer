@@ -52,8 +52,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         
         _fftRepresentation = new FftRepresentation(_fftProperties);
 
-        MinMagnitudeDbAxis = -300;
-        MaxMagnitudeDbAxis = 60;
+        MinMagnitudeDbAxis = -120;
+        MaxMagnitudeDbAxis = 30;
         Bandwidth = 10000;
         MinFrequencyAxis = 0;
         MaxFrequencyAxis = Bandwidth * 2;
@@ -93,15 +93,16 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         foreach (var rep in _representations) 
             _renderer.AddRepresentation(rep);
 
-        _transport.Start();
+        _ = _transport.Start();
         _streamingPool.DataReceived += HandleDataUpdate;
 
     }
 
     [RelayCommand]
-    public async Task StopReceiving()
+    public Task StopReceiving()
     {
         _transport?.Stop();
+        return Task.CompletedTask;
     }
 
     [RelayCommand]

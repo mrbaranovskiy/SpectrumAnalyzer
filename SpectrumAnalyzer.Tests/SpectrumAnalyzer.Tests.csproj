@@ -20,7 +20,18 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\SpectrumAnalyzer.Native\SpectrumAnalyzer.Native.csproj" />
       <ProjectReference Include="..\SpectrumAnalyzer\SpectrumAnalyzer.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="bin\Debug\net8.0\Avalonia.Dialogs.dll" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="bin\Debug\net8.0\libusrpc.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 
 </Project>

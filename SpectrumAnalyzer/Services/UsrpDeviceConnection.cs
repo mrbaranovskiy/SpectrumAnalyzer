@@ -5,11 +5,11 @@ using SpectrumAnalyzer.Services.Native;
 
 namespace SpectrumAnalyzer.Services;
 
-public class UsprDeviceConnection : IDeviceConnection<Complex, UsprConnectionProperties>
+public class UsrpDeviceConnection : IDeviceConnection<Complex, UsprConnectionProperties>
 {
     public ITransport<Complex> ConnectToDevice(UsprConnectionProperties connectionProps)
     {
-        return new UHDTransport(new UHDApiFake());
+        return new UsrpTransport(new UsrpApi());
     }
     
     public void Dispose()

@@ -8,7 +8,7 @@ using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Services;
 
-public class UHDTransport : ITransport<Complex>
+public class UsrpTransport : ITransport<Complex>
 {
     private readonly IDeviceNativeApi<float> _api;
     private Task _readTask;
@@ -16,20 +16,19 @@ public class UHDTransport : ITransport<Complex>
     private ArrayPool<Complex> _pool;
     private Memory<Complex> _memory;
     public event EventHandler<DataReceivedEventArgs>? DataReceived;
-    private static readonly object _lock = new();
+    private static readonly object Lock = new();
     private double _time; //temporary used for signal generation,
     private Complex[] _buffer;
     private int _receivingChunkSize = 1 << 12;
 
-    public UHDTransport(IDeviceNativeApi<float> api)
+    public UsrpTransport(IDeviceNativeApi<float> api)
     {
+        _readTask = Task.CompletedTask;
         _api = api;
         //todo: resolve this mess with receiving size
         _pool = ArrayPool<Complex>.Shared;
         _buffer = _pool.Rent(ReceivingChunkSize);
         _memory = new Memory<Complex>(_buffer, 0, ReceivingChunkSize);
-        // todo: not the best idea.... do some start function.. 
-        
     }
 
     public bool IsStreaming => _readTask.Status == TaskStatus.Running;
@@ -38,10 +37,8 @@ public class UHDTransport : ITransport<Complex>
 
     public ReadOnlySpan<Complex> GetRawData()
     {
-        lock (_lock)
-        {
+        lock (Lock)
             return _memory.Span;
-        }
     }
 
     public int ReceivingChunkSize
@@ -72,7 +69,7 @@ public class UHDTransport : ITransport<Complex>
 
     private void ResetPools()
     {
-        lock (_lock)
+        lock (Lock)
         {
             _pool.Return(_buffer, true);
             _pool = ArrayPool<Complex>.Shared;
@@ -86,7 +83,7 @@ public class UHDTransport : ITransport<Complex>
         //no fansy asynk await
         while (!_cts.Token.IsCancellationRequested)
         {
-            lock (_lock)
+            lock (Lock)
             {
                 // this is bad. No good control for the data.
                 // data can be lost. 

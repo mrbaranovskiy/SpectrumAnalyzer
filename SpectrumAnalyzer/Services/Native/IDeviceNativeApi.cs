@@ -1,50 +1,15 @@
-﻿namespace SpectrumAnalyzer.Services.Native;
+﻿using System;
 
-public interface IDeviceNativeApi<TRaw>
+namespace SpectrumAnalyzer.Services.Native;
+
+public interface IDeviceNativeApi<TData> : IDisposable
 {
-    void Start();
-    void Stop();
-    void SetFrequency(int frequency);
-    void SetBandwidth(int bandwidth);
-    void SetChannels(int channels);
-    void  SetRfGain(int rfGain);
-    unsafe TRaw* ReadRawData();
-}
+    int Open(string args = "");
+    void Close();
+    string GetLastError();
+    int ConfigureRx(double frequencyHz, double sampleRata, double gain,
+        double bandwidth, string antenna = "TX/RX", string refClk = "internal", int tunning = 0, uint channel = 0);
+    int PrepareStream(uint channel = 0);
 
-public class UHDApiFake : IDeviceNativeApi<float>
-{
-    public void Start()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void Stop()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void SetFrequency(int frequency)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void SetBandwidth(int bandwidth)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void SetChannels(int channels)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void SetRfGain(int rfGain)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public unsafe float* ReadRawData()
-    {
-        throw new System.NotImplementedException();
-    }
+    int Receive(TData[] buffer, int count, out int bytesRead);
 }

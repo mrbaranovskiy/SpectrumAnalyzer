@@ -14,7 +14,7 @@ public class StreamingPoolTests
     public async Task TestStreamingDataPool()
     {
         var moq = new Mock<IDeviceNativeApi<float>>();
-        using ITransport<Complex> transport = new UHDTransport(moq.Object);
+        using ITransport<Complex> transport = new UsrpTransport(moq.Object);
         var sdp = new StreamingIQPool(transport);
         var messagesCount = 0;
         sdp.DataReceived += (sender, args) =>
