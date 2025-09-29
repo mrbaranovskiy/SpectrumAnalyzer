@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Drawing.Imaging;
 using System.Numerics;
 using Avalonia;
 using SpectrumAnalyzer.Utilities;
@@ -8,70 +9,32 @@ using Avalonia.Media;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentationProperties, Complex>
+public class FftRepresentation : RendererRepresentationAbstract<FFTDrawingProperties, Complex>
 {
-    private BitmapGraphics _bitmapGraphics;
-
-    public FftRepresentation(FFTRepresentationProperties properties) 
+    public FftRepresentation(FFTDrawingProperties properties) 
         : base(properties)
     {
        UpdateDrawingProperties(properties);
     }
 
-    private void InitBuffers()
-    {
-        _bitmapGraphics = BitmapGraphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
-        var windowSize = DrawingProperties.Height * DrawingProperties.Width * 4;
-        
-        _bitmapPool = ArrayPool<byte>.Create(windowSize, 1);
-        _bitmapBuffer = _bitmapPool.Rent(windowSize);
-        _bitmapMemoryHandle = new Memory<byte>(_bitmapBuffer, 0, windowSize);
-        _signalBuffer = ArrayPool<Complex>.Shared.Rent(DrawingProperties.DataBufferLength);
-        _signalMemoryHandle = new Memory<Complex>(_signalBuffer, 0, DrawingProperties.DataBufferLength);
-    }
-
-    public override void UpdateDrawingProperties(FFTRepresentationProperties properties)
-    {
-        if(properties.Width <= 0 || properties.Height <= 0)
-            return;
-        
-        //do nothing if buffers size not affected.
-        if(DrawingProperties.Width == properties.Width
-           && DrawingProperties.Height == properties.Height 
-           && DrawingProperties.DataBufferLength == properties.DataBufferLength
-           )
-            
-            return;
-
-        if (_bitmapBuffer != null) _bitmapPool?.Return(_bitmapBuffer);
-        if (_signalBuffer != null) ArrayPool<Complex>.Shared.Return(_signalBuffer);
-        
-        DrawingProperties = properties;
-        
-        InitBuffers();
-
-       
-    }
-    
     public override void Dispose()
     {
-        _bitmapPool.Return(_bitmapBuffer);
-        ArrayPool<Complex>.Shared.Return(_signalBuffer);
+        BitmapPool.Return(BitmapBuffer);
+        ArrayPool<Complex>.Shared.Return(SignalBuffer);
     }
 
     public override void BuildRepresentation(ReadOnlySpan<Complex> data)
     {
-        if (data.Length != _signalMemoryHandle.Length)
+        if (data.Length != SignalMemoryHandle.Length)
             throw new NotImplementedException("Implement resize");
         
         //todo: probably this is redundant copy
-        data.CopyTo(_signalMemoryHandle.Span);
-        _bitmapMemoryHandle.Span.Clear();
+        data.CopyTo(SignalMemoryHandle.Span);
+        BitmapMemoryHandle.Span.Clear();
 
-        // FftSharp.Windows.Rectangular rw = new Rectangular();
-        FftSharp.FFT.Forward(_signalMemoryHandle.Span);
-        // todo: GC intensive code. Need to reimplement this.
-        var power = FftSharp.FFT.Power(_signalBuffer);
+        FftSharp.FFT.Forward(SignalMemoryHandle.Span);
+        // todo: GC intensive code. Need to Implement FFT over Spans.
+        var power = FftSharp.FFT.Power(SignalBuffer);
         var freq = FftSharp.FFT.FrequencyScale(power.Length, DrawingProperties.SamplingRate);
 
         var wndSize = DrawingProperties.Height * DrawingProperties.Width * 4;
@@ -82,7 +45,7 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         //there is no much sense to draw them all.
         // temporary I took 3 screen width. 
         // Mayne some Shannon theorem to avoid signal lost.
-        int numberOfDrawedPoints =  Math.Max(_signalBuffer.Length / 2, 1024);
+        int numberOfDrawedPoints =  Math.Max(SignalBuffer.Length / 2, 1024);
         var screenPointsMem = new Memory<Point>(screenPoints, 0, numberOfDrawedPoints);
 
         var resampledPower = ArrayPool<double>.Shared.Rent(numberOfDrawedPoints);
@@ -99,14 +62,13 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTRepresentatio
         GeneratePoints(screenPointsMem.Span, ys, xs );
         
         // _bitmapGraphics.DrawLines(_bitmapMemoryHandle.Span, screenPointsMem.Span, Colors.White);
-        _bitmapGraphics.DrawLines(_bitmapMemoryHandle, screenPointsMem, Colors.Green);
-        
+        BitmapGraphics.DrawLines(BitmapMemoryHandle, screenPointsMem, Colors.Green);
         ArrayPool<Point>.Shared.Return(screenPoints, true); 
         ArrayPool<double>.Shared.Return(resampledPower, true);
         ArrayPool<double>.Shared.Return(resampledFreq, true);
     }
 
-    public override ReadOnlySpan<byte> CurrentFrame => _bitmapMemoryHandle.Span;
+    public override ReadOnlySpan<byte> CurrentFrame => BitmapMemoryHandle.Span;
 
     private void GeneratePoints(Span<Point> output,
         ReadOnlySpan<double> ys,

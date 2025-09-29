@@ -31,8 +31,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private FftRepresentation _fftRepresentation;
     private WaterfallRepresentation _waterfallRepresentation;
     
-    private FFTRepresentationProperties _fftProperties; 
-    private WaterfallRepresentationProperties _waterfallRepresentationProperties;
+    private FFTDrawingProperties _fftProperties; 
+    private WaterfallDrawingProperties _waterfallDrawingProperties;
     
     private double _fftCtrlWidth;
     private double _fftCtrlHeight;
@@ -41,7 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         _usrpConnection = usrpConnection;
         _representations = new List<IRendererRepresentation<Complex>>();
-        _fftProperties = new FFTRepresentationProperties(
+        _fftProperties = new FFTDrawingProperties(
             ITransport<Complex>.DefaultChunkSize,
             100,
             100,

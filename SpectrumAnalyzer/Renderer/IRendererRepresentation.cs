@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Renderer;
 
@@ -19,15 +21,18 @@ public interface IRendererRepresentation<TData> : IDisposable where TData : stru
 
 //todo: handle DrawingProperties change!!!!
 public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
-    : IRendererRepresentation<TData> where TData : struct
+    : IRendererRepresentation<TData> 
+    where TData : struct
+    where TDrawingProperties : IDrawingProperties
 {
-    private protected readonly IStreamingDataPool<TData> _dataPool;
-    private protected ArrayPool<byte> _bitmapPool;
-    private protected Memory<byte> _bitmapMemoryHandle;
-    private protected Memory<TData> _signalMemoryHandle;
-    private protected byte[] _bitmapBuffer;
-    private protected TData[] _signalBuffer;
-    private TDrawingProperties _drawingProperties;
+    protected BitmapGraphics BitmapGraphics;
+    protected readonly IStreamingDataPool<TData> DataPool;
+    protected ArrayPool<byte> BitmapPool;
+    protected Memory<byte> BitmapMemoryHandle;
+    protected Memory<TData> SignalMemoryHandle;
+    protected byte[] BitmapBuffer;
+    protected TData[] SignalBuffer;
+    TDrawingProperties _drawingProperties;
 
     protected RendererRepresentationAbstract([DisallowNull] TDrawingProperties drawingProperties)
     {
@@ -46,8 +51,39 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
         }
     }
 
+    public virtual void UpdateDrawingProperties(TDrawingProperties properties)
+    {
+        if(properties.Width <= 0 || properties.Height <= 0)
+            return;
+        
+        //do nothing if buffers size not affected.
+        if(DrawingProperties.Width == properties.Width
+           && DrawingProperties.Height == properties.Height 
+           && DrawingProperties.DataBufferLength == properties.DataBufferLength
+          )
+            
+            return;
 
-    public abstract void UpdateDrawingProperties(TDrawingProperties properties);
+        if (BitmapBuffer != null) BitmapPool?.Return(BitmapBuffer);
+        if (SignalBuffer != null) ArrayPool<TData>.Shared.Return(SignalBuffer);
+        
+        DrawingProperties = properties;
+        
+        InitBuffers();
+    }
+
+    public virtual void InitBuffers()
+    {
+        BitmapGraphics = BitmapGraphics.CreateGraphics(DrawingProperties.Width, DrawingProperties.Height, 1.0);
+        var windowSize = DrawingProperties.Height * DrawingProperties.Width * 4;
+        
+        BitmapPool = ArrayPool<byte>.Create(windowSize, 1);
+        BitmapBuffer = BitmapPool.Rent(windowSize);
+        BitmapMemoryHandle = new Memory<byte>(BitmapBuffer, 0, windowSize);
+        SignalBuffer = ArrayPool<TData>.Shared.Rent(DrawingProperties.DataBufferLength);
+        SignalMemoryHandle = new Memory<TData>(SignalBuffer, 0, DrawingProperties.DataBufferLength);
+    }
+
     public abstract void BuildRepresentation(ReadOnlySpan<TData> data);
     public abstract ReadOnlySpan<byte> CurrentFrame { get; }
 
@@ -55,9 +91,7 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
 
     public virtual void Dispose()
     {
-        _bitmapPool.Return(_bitmapBuffer);
-        ArrayPool<TData>.Shared.Return(_signalBuffer);
+        BitmapPool.Return(BitmapBuffer);
+        ArrayPool<TData>.Shared.Return(SignalBuffer);
     }
 }
-
-//todo: it is to complicated. convert to class an add checks.
