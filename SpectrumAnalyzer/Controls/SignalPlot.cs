@@ -19,14 +19,16 @@ namespace SpectrumAnalyzer.Controls;
 
 public class SignalPlot : TemplatedControl
 {
+    private WriteableBitmap _source;
+
     public SignalPlot()
     {
         SizeChanged += (sender, args) =>
         {
             ViewportHeight = (int)Height;
             ViewportWidth = (int)Width;
-            
-            if (sender is TemplatedControl {Height: > 0 , Width: > 0} ctrl)
+
+            if (sender is TemplatedControl { Height: > 0, Width: > 0 } ctrl)
                 _source = CreateBitmap(ctrl);
         };
 
@@ -34,9 +36,9 @@ public class SignalPlot : TemplatedControl
         {
             ViewportHeight = (int)Height;
             ViewportWidth = (int)Width;
-          
-            
-            if (sender is TemplatedControl {Height: > 0 , Width: > 0} ctrl )
+
+
+            if (sender is TemplatedControl { Height: > 0, Width: > 0 } ctrl)
                 _source = CreateBitmap(ctrl);
         };
     }
@@ -74,24 +76,9 @@ public class SignalPlot : TemplatedControl
         set => SetAndRaise(ViewportHeightProperty, ref _viewportHeight, value);
     }
 
-    // Bottom layer: bind your WriteableBitmap (or any IBitmap)
-    //
-    // public static readonly StyledProperty<WriteableBitmap?> SourceProperty =
-    //     AvaloniaProperty.Register<SignalPlot, WriteableBitmap?>(nameof(Source));
 
-    private WriteableBitmap _source;
-    
+   
 
-    // public static readonly DirectProperty<SignalPlot, WriteableBitmap> SourceProperty = AvaloniaProperty.RegisterDirect<SignalPlot, WriteableBitmap>(
-    //     nameof(Source), o => o.Source, (o, v) => o.Source = v);
-    //
-    // public WriteableBitmap Source
-    // {
-    //     get => _source;
-    //     set => SetAndRaise(SourceProperty, ref _source, value);
-    // }
-
-    // Axes range for labels (overlay doesn’t care about how you draw pixels)
     
     public static readonly StyledProperty<double> MinXProperty =
         AvaloniaProperty.Register<SignalPlot, double>(nameof(MinX), 0);
@@ -142,12 +129,6 @@ public class SignalPlot : TemplatedControl
         get => GetValue(RepresentationProperty);
         set => SetValue(RepresentationProperty, value);
     }
-    //
-    // public WriteableBitmap? Source
-    // {
-    //     get => GetValue(SourceProperty);
-    //     set => SetValue(SourceProperty, value);
-    // }
 
     public double MinX { get => GetValue(MinXProperty); set => SetValue(MinXProperty, value); }
     public double MaxX { get => GetValue(MaxXProperty); set => SetValue(MaxXProperty, value); }
@@ -179,9 +160,9 @@ public class SignalPlot : TemplatedControl
         context.DrawImage(_source, src, dst);
     }
     
-    public unsafe void UpdateData(ReadOnlySpan<byte> bgra) // length = w*h*4 (premul)
+    public unsafe void UpdateData(ReadOnlySpan<byte> bgra)
     {
-        using var fb = _source.Lock();            // ILockedFramebuffer
+        using var fb = _source.Lock();
         var dst = new Span<byte>((void*)fb.Address, fb.RowBytes * fb.Size.Height);
         dst.Clear();
         
@@ -192,7 +173,6 @@ public class SignalPlot : TemplatedControl
         }
         else
         {
-            // handle padded rowbytes
             for (var y = 0; y < (int)Height; y++)
             {
                 bgra.Slice(y * srcStride, srcStride)

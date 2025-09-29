@@ -86,7 +86,6 @@ internal class SignalPlotOverlay : Control
             var gridPen = new Pen(GridBrush, GridThickness);
             var axisPen = new Pen(AxisBrush, AxisThickness);
 
-            // vertical grid lines
             if (GridDivisionsX > 0)
             {
                 for (int i = 0; i <= GridDivisionsX; i++)
@@ -96,7 +95,6 @@ internal class SignalPlotOverlay : Control
                 }
             }
 
-            // horizontal grid lines
             if (GridDivisionsY > 0)
             {
                 for (int j = 0; j <= GridDivisionsY; j++)
@@ -106,13 +104,11 @@ internal class SignalPlotOverlay : Control
                 }
             }
 
-            // axes (frame)
             ctx.DrawLine(axisPen, new Point(inner.Left, inner.Top), new Point(inner.Right, inner.Top));
             ctx.DrawLine(axisPen, new Point(inner.Left, inner.Bottom), new Point(inner.Right, inner.Bottom));
             ctx.DrawLine(axisPen, new Point(inner.Left, inner.Top), new Point(inner.Left, inner.Bottom));
             ctx.DrawLine(axisPen, new Point(inner.Right, inner.Top), new Point(inner.Right, inner.Bottom));
 
-            // ticks & labels (simple evenly spaced labels)
             int xTickCount = GridDivisionsX;
             int yTickCount = GridDivisionsY;
 
@@ -121,7 +117,6 @@ internal class SignalPlotOverlay : Control
                 double t = (double)i / xTickCount;
                 double x = inner.X + t * inner.Width;
 
-                // small tick
                 ctx.DrawLine(axisPen, new Point(x, inner.Bottom), new Point(x, inner.Bottom + 4));
 
                 double xv = MinX + t * (MaxX - MinX);
@@ -131,9 +126,8 @@ internal class SignalPlotOverlay : Control
             for (int j = 0; j <= yTickCount; j++)
             {
                 double t = (double)j / yTickCount;
-                double y = inner.Y + (1 - t) * inner.Height; // top -> max
+                double y = inner.Y + (1 - t) * inner.Height;
 
-                // small tick
                 ctx.DrawLine(axisPen, new Point(inner.Left - 4, y), new Point(inner.Left, y));
 
                 double yv = MinY + t * (MaxY - MinY);
