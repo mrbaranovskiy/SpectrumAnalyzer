@@ -102,7 +102,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         return Lerp(Colors.Yellow, Colors.Black, level);
     }
     
-    public static Color Lerp(Color startColor, Color endColor, float amount)
+    private static Color Lerp(Color startColor, Color endColor, float amount)
     {
         amount = Math.Clamp(amount, 0f, 1f);
 
