@@ -41,6 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         _usrpConnection = usrpConnection;
         _representations = new List<IRendererRepresentation<Complex>>();
+        
         _fftProperties = new FFTDrawingProperties(
             ITransport<Complex>.DefaultChunkSize,
             100,
@@ -50,7 +51,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             , SamplingRate,
             new AxisRange(-120, 30),
             new AxisRange(0, Bandwidth));
-        
+
+        _waterfallDrawingProperties = new WaterfallDrawingProperties(ITransport<Complex>.DefaultChunkSize,
+            100, 100, Bandwidth, CenterFrequency, SamplingRate,
+            new AxisRange(-120, 30),
+            new AxisRange(0, Bandwidth)
+        );
+
+        _waterfallRepresentation = new WaterfallRepresentation(_waterfallDrawingProperties);
         _fftRepresentation = new FftRepresentation<FFTDrawingProperties>(_fftProperties);
 
         MinMagnitudeDbAxis = -120;
@@ -63,7 +71,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         SamplingRate = Bandwidth / 2;
         CenterFrequency = 433_000_000;
         
-        _representations.Add(_fftRepresentation);
+        //_representations.Add(_fftRepresentation);
+        _representations.Add(_waterfallRepresentation);
     }
 
     [RelayCommand]
@@ -151,6 +160,16 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
+    public WaterfallRepresentation WaterfallRepresentation
+    {
+        get => _waterfallRepresentation;
+        set
+        {
+            _waterfallRepresentation = value;
+            this.RaisePropertyChanged();
+        }
+    }
+    
     public int CenterFrequency
     {
         get => _centerFrequency;
@@ -236,6 +255,20 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         };
         
         _fftRepresentation.UpdateDrawingProperties(_fftProperties);
+
+
+        _waterfallDrawingProperties = _waterfallDrawingProperties with
+        {
+            Width = (int)FftCtrlWidth,
+            Height = (int)FftCtrlHeight,
+            Bandwidth = Bandwidth,
+            CenterFrequency = CenterFrequency,
+            SamplingRate = SamplingRate,
+            XAxisRange = new AxisRange(_minFrequencyAxis, _maxFrequencyAxis),
+            YAxisRange = new AxisRange(_minMagnitudeDbAxis, _maxMagnitudeDbAxis)
+        };
+        
+        _waterfallRepresentation.UpdateDrawingProperties(_waterfallDrawingProperties);
     }
 
     private void HandleDataUpdate(object? sender, DataReceivedEventArgs e)

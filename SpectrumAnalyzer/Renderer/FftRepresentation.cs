@@ -31,7 +31,6 @@ public class FftRepresentation<TDrawingProperties>
         
         //todo: probably this is redundant copy
         data.CopyTo(SignalMemoryHandle.Span);
-        BitmapMemoryHandle.Span.Clear();
 
         FftSharp.FFT.Forward(SignalMemoryHandle.Span);
         // todo: GC intensive code. Need to Implement FFT over Spans.

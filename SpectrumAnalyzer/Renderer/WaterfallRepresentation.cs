@@ -99,7 +99,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         
         var level = (float)Math.Clamp( (h) /  max, 0, 1);
         
-        return Lerp(Colors.Black, Colors.Yellow, level);
+        return Lerp(Colors.Yellow, Colors.Black, level);
     }
     
     public static Color Lerp(Color startColor, Color endColor, float amount)
@@ -113,8 +113,6 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
 
         return Color.FromArgb(a, r, g, b);
     }
-
-    public override ReadOnlySpan<byte> CurrentFrame => ReadOnlySpan<byte>.Empty;
 
     protected override void HandleDrawingPropertiesUpdated()
     {
