@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using System.Drawing.Imaging;
 using System.Numerics;
 using Avalonia;
 using SpectrumAnalyzer.Utilities;
@@ -9,12 +8,14 @@ using Avalonia.Media;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public class FftRepresentation : RendererRepresentationAbstract<FFTDrawingProperties, Complex>
+public class FftRepresentation<TDrawingProperties> 
+    : RendererRepresentationAbstract<TDrawingProperties, Complex> 
+    where TDrawingProperties : IDrawingProperties
 {
-    public FftRepresentation(FFTDrawingProperties properties) 
+    public FftRepresentation(TDrawingProperties properties) 
         : base(properties)
     {
-       UpdateDrawingProperties(properties);
+        UpdateDrawingProperties(properties);
     }
 
     public override void Dispose()
@@ -59,18 +60,24 @@ public class FftRepresentation : RendererRepresentationAbstract<FFTDrawingProper
         var ys = resPowerMem.Span;
         var xs = resFreqMem.Span;
         
-        GeneratePoints(screenPointsMem.Span, ys, xs );
+        Draw(screenPointsMem, ys, xs);
         
-        // _bitmapGraphics.DrawLines(_bitmapMemoryHandle.Span, screenPointsMem.Span, Colors.White);
-        BitmapGraphics.DrawLines(BitmapMemoryHandle, screenPointsMem, Colors.Green);
         ArrayPool<Point>.Shared.Return(screenPoints, true); 
         ArrayPool<double>.Shared.Return(resampledPower, true);
         ArrayPool<double>.Shared.Return(resampledFreq, true);
     }
 
+    protected override void Draw(Memory<Point> generatePoints, Span<double> ys, Span<double> xs)
+    {
+        GeneratePoints(generatePoints.Span, ys, xs );
+
+        // _bitmapGraphics.DrawLines(_bitmapMemoryHandle.Span, screenPointsMem.Span, Colors.White);
+        BitmapGraphics.DrawLines(BitmapMemoryHandle, generatePoints, Colors.Green);
+    }
+
     public override ReadOnlySpan<byte> CurrentFrame => BitmapMemoryHandle.Span;
 
-    private void GeneratePoints(Span<Point> output,
+    protected void GeneratePoints(Span<Point> output,
         ReadOnlySpan<double> ys,
         ReadOnlySpan<double> xs)
     {

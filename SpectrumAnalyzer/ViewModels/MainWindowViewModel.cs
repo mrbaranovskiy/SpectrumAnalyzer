@@ -28,7 +28,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     private List<IRendererRepresentation<Complex>> _representations;
     
-    private FftRepresentation _fftRepresentation;
+    private FftRepresentation<FFTDrawingProperties> _fftRepresentation;
     private WaterfallRepresentation _waterfallRepresentation;
     
     private FFTDrawingProperties _fftProperties; 
@@ -51,7 +51,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             new AxisRange(-120, 30),
             new AxisRange(0, Bandwidth));
         
-        _fftRepresentation = new FftRepresentation(_fftProperties);
+        _fftRepresentation = new FftRepresentation<FFTDrawingProperties>(_fftProperties);
 
         MinMagnitudeDbAxis = -120;
         MaxMagnitudeDbAxis = 30;
@@ -141,7 +141,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    public FftRepresentation FftRepresentation
+    public FftRepresentation<FFTDrawingProperties> FftRepresentation
     {
         get => _fftRepresentation;
         set

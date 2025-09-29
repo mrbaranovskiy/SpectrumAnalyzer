@@ -1,4 +1,5 @@
-﻿using SpectrumAnalyzer.Utilities;
+﻿using Avalonia.Media;
+using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Renderer;
 
@@ -8,6 +9,8 @@ public record WaterfallDrawingProperties(
     int Height,
     int Bandwidth,
     int CenterFrequency,
-    int SamplingRate, 
-    AxisRange XRange
-    ) : IDrawingProperties;
+    int SamplingRate,
+    AxisRange XAxisRange,
+    AxisRange YAxisRange,
+    double XScaleFrequency = 0
+) : IDrawingProperties;

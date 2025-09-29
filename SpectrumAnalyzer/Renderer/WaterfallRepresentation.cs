@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Numerics;
+using Avalonia;
+using Avalonia.Media;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public sealed class WaterfallRepresentation : RendererRepresentationAbstract<WaterfallDrawingProperties, Complex>
+public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingProperties>
 {
     private byte[] _cyclicScreenBuffer = null;
-    private Memory<byte> _cyclicScreenBufferMemory = null;
+    private Memory<byte> _cyclicScreenBufferMemory;
     private int _cycleIndex = 0;
     
     public WaterfallRepresentation(WaterfallDrawingProperties properties) : base(properties)
@@ -16,33 +17,106 @@ public sealed class WaterfallRepresentation : RendererRepresentationAbstract<Wat
 
     public override void InitBuffers()
     {
-        if(_cyclicScreenBuffer != null)
-            BitmapPool.Return(_cyclicScreenBuffer);
-        
-        _cyclicScreenBuffer = this.BitmapPool.Rent(
-            DrawingProperties.Width * DrawingProperties.Height * 4);
-        
         base.InitBuffers();
+        
+        if (_cyclicScreenBuffer != null)
+        {
+            BitmapPool.Return(_cyclicScreenBuffer);
+            _cycleIndex = 0;
+        }
+        
+        _cyclicScreenBuffer = BitmapPool.Rent(
+            DrawingProperties.Width * DrawingProperties.Height * 4);
+
+        _cyclicScreenBufferMemory = new Memory<byte>(_cyclicScreenBuffer);
     }
 
-    public override void BuildRepresentation(ReadOnlySpan<Complex> data)
+    protected override void Draw(Memory<Point> generatePoints, Span<double> magnitudes, Span<double> freqs)
     {
-        if (data.Length != SignalMemoryHandle.Length)
-            throw new NotImplementedException("Implement resize");
+        GeneratePoints(generatePoints.Span, magnitudes, freqs);
+
+        var startIndex = _cycleIndex * DrawingProperties.Width * 4;
+        var row = _cyclicScreenBufferMemory.Slice(startIndex, DrawingProperties.Width * 4);
         
-        data.CopyTo(SignalMemoryHandle.Span);
-        BitmapMemoryHandle.Span.Clear();
+        for (int i = 1; i < generatePoints.Length; i++)
+        {
+            var prev =  generatePoints.Span[i - 1];
+            var pt =  generatePoints.Span[i];
+
+            var fromIdx = Convert.ToInt32(prev.X) * 4;
+            var toIdx = Convert.ToInt32(pt.X) * 4;
+            var color = SampleColor(prev.Y);
+
+            if (fromIdx == toIdx)
+            {
+                row.Span[fromIdx + 0] = color.R;
+                row.Span[fromIdx + 1] = color.G;
+                row.Span[fromIdx + 2] = color.B;
+                row.Span[fromIdx + 3] = color.A;
+            }
+            else
+            {
+                var drawUnit = row.Slice(fromIdx, toIdx - fromIdx);
+                for (int j = 0; j < drawUnit.Length; j+=4)
+                {
+                    drawUnit.Span[j + 0] = color.R;
+                    drawUnit.Span[j + 1] = color.G;
+                    drawUnit.Span[j + 2] = color.B;
+                    drawUnit.Span[j + 3] = color.A;
+                }
+            }
+        }
         
-        FftSharp.FFT.Forward(SignalMemoryHandle.Span);
-        // todo: GC intensive code. Need to Implement FFT over Spans.
-        var power = FftSharp.FFT.Power(SignalBuffer);
-        var freq = FftSharp.FFT.FrequencyScale(power.Length, DrawingProperties.SamplingRate);
+        // copy it to circular buf
+        // copy everything to the bitmap.
+
+        var tempCycleIndex = _cycleIndex;
+        for (int i = DrawingProperties.Height - 1; i >= 0; i--)
+        {
+            var idxInCycleBuffer = tempCycleIndex * DrawingProperties.Width * 4;
+            var indexInBtmBuffer = i * DrawingProperties.Width * 4;
+
+            var btmSlice = BitmapMemoryHandle.Slice(indexInBtmBuffer, DrawingProperties.Width * 4);
+            var crcSlice = _cyclicScreenBufferMemory.Slice(idxInCycleBuffer, DrawingProperties.Width * 4);
+
+            if (btmSlice.Length != crcSlice.Length)
+                throw new InvalidOperationException("Something is wrong with buffers strides calculations");
+            
+            crcSlice.CopyTo(btmSlice);
+
+            tempCycleIndex--;
+            
+            if (tempCycleIndex < 0)
+                tempCycleIndex = DrawingProperties.Height - 1;
+        }
+
+        _cycleIndex = ++_cycleIndex % DrawingProperties.Height;
+    }
+
+    private Color SampleColor(double h)
+    {
+        var max = DrawingProperties.Height;
+        
+        var level = (float)Math.Clamp( (h) /  max, 0, 1);
+        
+        return Lerp(Colors.Black, Colors.Yellow, level);
+    }
+    
+    public static Color Lerp(Color startColor, Color endColor, float amount)
+    {
+        amount = Math.Clamp(amount, 0f, 1f);
+
+        byte r = (byte)(startColor.R + (endColor.R - startColor.R) * amount);
+        byte g = (byte)(startColor.G + (endColor.G - startColor.G) * amount);
+        byte b = (byte)(startColor.B + (endColor.B - startColor.B) * amount);
+        byte a = (byte)(startColor.A + (endColor.A - startColor.A) * amount);
+
+        return Color.FromArgb(a, r, g, b);
     }
 
     public override ReadOnlySpan<byte> CurrentFrame => ReadOnlySpan<byte>.Empty;
 
     protected override void HandleDrawingPropertiesUpdated()
     {
-        throw new NotImplementedException();
     }
 }

@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using Avalonia;
 using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Renderer;
@@ -51,18 +52,18 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
         }
     }
 
-    public virtual void UpdateDrawingProperties(TDrawingProperties properties)
+    public void UpdateDrawingProperties(TDrawingProperties properties)
     {
         if(properties.Width <= 0 || properties.Height <= 0)
             return;
         
         //do nothing if buffers size not affected.
-        if(DrawingProperties.Width == properties.Width
-           && DrawingProperties.Height == properties.Height 
-           && DrawingProperties.DataBufferLength == properties.DataBufferLength
-          )
-            
-            return;
+        // if(DrawingProperties.Width == properties.Width
+        //    && DrawingProperties.Height == properties.Height 
+        //    && DrawingProperties.DataBufferLength == properties.DataBufferLength
+        //   )
+        //     
+        //     return;
 
         if (BitmapBuffer != null) BitmapPool?.Return(BitmapBuffer);
         if (SignalBuffer != null) ArrayPool<TData>.Shared.Return(SignalBuffer);
@@ -71,6 +72,8 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
         
         InitBuffers();
     }
+
+    protected abstract void Draw(Memory<Point> generatePoints, Span<double> magnitudes, Span<double> freqs);
 
     public virtual void InitBuffers()
     {

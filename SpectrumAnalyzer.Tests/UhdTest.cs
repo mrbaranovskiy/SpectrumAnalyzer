@@ -22,11 +22,11 @@ public class UhdTest
         try {
             rc = UsrpNative.usrp_configure_rx(
                 h,
-                rate: 2e6,            // 2 MS/s
-                freq: 100e6,          // 100 MHz
-                gain: 30.0,           // 20 dB
-                bw: -1,               // skip BW
-                antenna: "TX/RX",       // or null
+                rate: 2e6,           
+                freq: 100e6,         
+                gain: 30.0,          
+                bw: -1,              
+                antenna: "TX/RX",    
                 subdev: null!,
                 refclk: "internal",
                 integer_n: 0,
@@ -38,13 +38,12 @@ public class UhdTest
 
             const int N = 4096;
             var iq = new float[2 * N];
-            UIntPtr got;
-            rc = UsrpNative.usrp_recv_once(h, iq, (UIntPtr)N, 500, out got);
+            UIntPtr output;
+            rc = UsrpNative.usrp_recv_once(h, iq, N, 500, out output);
             if (rc != 0) throw new Exception("recv_once: " + GetErr(h));
 
-            int nGot = (int)got;
+            int nGot = (int)output;
             Console.WriteLine($"Received {nGot} complex samples");
-            // iq[0]=I0, iq[1]=Q0, iq[2]=I1, iq[3]=Q1, ...
         }
         finally {
             UsrpNative.usrp_close(h);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using Avalonia;
+using Avalonia.Media;
 
 namespace SpectrumAnalyzer.Utilities;
 
@@ -32,20 +33,22 @@ public static class RangesMapper
     
     private static double Clamp01(double v) => v < 0 ? 0 : (v > 1 ? 1 : v);
     public static (double, double) Map2Point(
-        in Point data,                 // data.X = frequency (Hz), data.Y = magnitude (dB)
-        int height, int width,  // control size in pixels
+        in Point data,               
+        int height, int width,  
         double dbMin, double dbMax,
         double fMin,  double fMax,
         bool xLog = false)
     {
-        // Guard size
         if (width <= 0 || height <= 0) return new (0, 0);
 
-        if (dbMax <= dbMin) { dbMax = dbMin + 1e-9; }
-        if (fMax <= fMin)   { fMax  = fMin + 1e-9; }
+        if (dbMax <= dbMin)
+            dbMax = dbMin + 1e-9;
+        
+        if (fMax <= fMin)
+            fMax  = fMin + 1e-9;
 
         double fx = data.X;
-        double nx; // normalized 0..1
+        double nx; 
 
         if (!xLog)
         {
@@ -53,7 +56,6 @@ public static class RangesMapper
         }
         else
         {
-            // Log axis needs strictly positive bounds
             double lfMin = Math.Log(Math.Max(fMin, 1e-12));
             double lfMax = Math.Log(Math.Max(fMax, 1e-12));
             double lfx   = Math.Log(Math.Max(fx,   1e-12));
@@ -63,7 +65,7 @@ public static class RangesMapper
         double px = nx * (width - 1);
 
         double db = data.Y;
-        double ny = (dbMax - db) / (dbMax - dbMin); // 0 at top, 1 at bottom
+        double ny = (dbMax - db) / (dbMax - dbMin);
         ny = Clamp01(ny);
         double py = ny * (height - 1);
 
