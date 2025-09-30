@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Media;
 
@@ -45,8 +46,9 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
 
             var fromIdx = Convert.ToInt32(prev.X) * 4;
             var toIdx = Convert.ToInt32(pt.X) * 4;
-            var color = SampleColor(prev.Y);
-
+            //var color = SampleColor(prev.Y);
+            var color = SampleMagnitude(magnitudes[i]);
+            
             if (fromIdx == toIdx)
             {
                 row.Span[fromIdx + 0] = color.R;
@@ -56,6 +58,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
             }
             else
             {
+                
                 var drawUnit = row.Slice(fromIdx, toIdx - fromIdx);
                 for (int j = 0; j < drawUnit.Length; j+=4)
                 {
@@ -95,12 +98,38 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         _cycleIndex = ++_cycleIndex % DrawingProperties.Height;
     }
 
+
+    private List<Color> _colorRange =
+    [
+        Color.Parse("#0000ff"),
+        Color.Parse("#00ffff"),
+        Color.Parse("#00ff00"),
+        Color.Parse("#ffff00"),
+        Color.Parse("#ff0000"),
+    ];
+
+    private Color SampleMagnitude(double mag)
+    {
+        var point = (float)Math.Clamp(Utilities.RangesMapper.Remap(mag,
+            DrawingProperties.YAxisRange.Min,
+            DrawingProperties.YAxisRange.Max, 0, 1), 0.0, 1.0);
+
+      
+        var index = (_colorRange.Count - 1) * point; 
+        var low = (int)Math.Floor(index);
+        var high = (int)Math.Ceiling(index);
+
+        if (low == high)
+            return _colorRange[low];
+        
+        return Lerp(_colorRange[low], _colorRange[high], point);
+    }
+    
+    
     private Color SampleColor(double h)
     {
         var max = DrawingProperties.Height;
-        
         var level = (float)Math.Clamp( (h) /  max, 0, 1);
-        
         return Lerp(Colors.Yellow, Colors.Black, level);
     }
     

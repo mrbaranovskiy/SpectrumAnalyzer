@@ -26,6 +26,22 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private double _minMagnitudeDbAxis;
     private double _maxMagnitudeDbAxis;
 
+    public List<string> Radios { get; } =
+    [
+        "Fake Radio",
+        "USRP"
+    ];
+
+    public int SelectedRadio
+    {
+        get => _selectedRadio;
+        set
+        {
+            _selectedRadio = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
     private List<IRendererRepresentation<Complex>> _representations;
     
     private FftRepresentation<FFTDrawingProperties> _fftRepresentation;
@@ -39,6 +55,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     private double _waterfallCtrlWidth;
     private double _waterfallCtrlHeight;
+    private int _selectedRadio;
 
 
     public MainWindowViewModel(IDeviceConnection<Complex, UsrpConnectionProperties> usrpConnection)
@@ -55,7 +72,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             Bandwidth,
             CenterFrequency,
             SamplingRate,
-            new AxisRange(-80, 10),
+            new AxisRange(-80, -20),
             new AxisRange(CenterFrequency,
                 CenterFrequency + SamplingRate / 2));
 
@@ -63,7 +80,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             100, 100,
             Bandwidth,
             CenterFrequency, SamplingRate,
-            new AxisRange(-80, 10),
+            new AxisRange(-80, -20),
             new AxisRange(CenterFrequency - SamplingRate,
                 CenterFrequency + SamplingRate)
         );
@@ -71,9 +88,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _waterfallRepresentation = new WaterfallRepresentation(_waterfallDrawingProperties);
         _fftRepresentation = new FftRepresentation<FFTDrawingProperties>(_fftProperties);
 
-        MinMagnitudeDbAxis = -120;
-        MaxMagnitudeDbAxis = 30;
-        Bandwidth = 2_000_000;
+        MinMagnitudeDbAxis = -80;
+        MaxMagnitudeDbAxis = 0;
+        Bandwidth = 10_000_000;
         MinFrequencyAxis = 0;
         MaxFrequencyAxis = Bandwidth * 2;
         FftCtrlWidth = 800;
@@ -88,25 +105,35 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _representations.Add(_waterfallRepresentation);
     }
 
-    [RelayCommand]
-    public async Task StartReceiving()
+    public bool IsStartEnabled => _transport is not { IsStreaming: true };
+    public bool IsStopEnabled => !IsStartEnabled;
+    
+    [RelayCommand(CanExecute = "IsStartEnabled", AllowConcurrentExecutions = true)]
+    public Task StartReceiving()
     {
         if(!_representations.Any())
-            return;
+            return Task.CompletedTask;
         
         // it is stupid.... but i have no much time to 
         // implement different devices, device manager and so on..
         var connectionProps = new UsrpConnectionProperties
         {
-            Antenna = "TX/RX",
+            Antenna = "RX2",
             BandwidthHz = Bandwidth,
             CenterFrequencyHz = CenterFrequency,
-            GainDb = 20,
+            GainDb = 40,
             SampleRateHz = SamplingRate
         };
-        
-        _transport = _usrpConnection.BuildConnection(connectionProps);
-        _transport.ReceivingChunkSize = ITransport<Complex>.DefaultChunkSize;
+
+        if (SelectedRadio == 0)
+        {
+            _transport = new FakeTransport(connectionProps, ITransport<Complex>.DefaultChunkSize);
+        }
+        else
+        {
+            _transport = _usrpConnection.BuildConnection(connectionProps);
+            _transport.ReceivingChunkSize = ITransport<Complex>.DefaultChunkSize;
+        }
             
         _streamingPool = new StreamingIQPool(_transport);
         Renderer = new ComplexDataRenderer(_streamingPool);
@@ -118,19 +145,23 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         _ = _transport.Start();
         _streamingPool.DataReceived += HandleDataUpdate;
-
-    }
-
-    [RelayCommand]
-    public Task StopReceiving()
-    {
-        _transport?.Stop();
+        this.StartReceivingCommand.NotifyCanExecuteChanged();
+        this.StopReceivingCommand.NotifyCanExecuteChanged();
         return Task.CompletedTask;
     }
 
-    [RelayCommand]
-    public async Task Restart() {}
+    [RelayCommand(CanExecute = "IsStopEnabled", AllowConcurrentExecutions = true)]
+    public async Task StopReceiving()
+    {
+        await _transport?.Stop()!;
 
+        // not for production....
+        while (_transport is { IsStreaming: true }) 
+            await Task.Delay(100);
+        
+        StartReceivingCommand.NotifyCanExecuteChanged();
+        StopReceivingCommand.NotifyCanExecuteChanged();
+    }
     public ComplexDataRenderer Renderer
     {
         get => _renderer;

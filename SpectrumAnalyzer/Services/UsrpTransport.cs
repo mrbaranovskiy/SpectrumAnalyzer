@@ -73,7 +73,7 @@ public class UsrpTransport : ITransport<Complex>
         var gain = _connectionProps.GainDb;
         var bw = _connectionProps.BandwidthHz;
         
-        _api.ConfigureRx(fr,sr,  gain, bw);
+        _api.ConfigureRx(fr,sr,  gain, bw, antenna: _connectionProps.Antenna);
         _api.PrepareStream(0);
         _readTask = Task.Run(ReadingLoop);
         return _readTask;

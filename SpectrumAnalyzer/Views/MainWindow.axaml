@@ -80,10 +80,15 @@
             />
         
         
-        <StackPanel  Orientation="Horizontal" Grid.Row="2">
-            <Button Command="{Binding StartReceivingCommand}" Width="80">Start</Button>            
-            <Button Command="{Binding StopReceivingCommand}" Width="80">Stop</Button>            
-            <Button Command="{Binding RestartCommand}" Width="80">Restart</Button>            
+        <StackPanel Margin="10" Orientation="Horizontal" Grid.Row="2">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                <Button Name="StartBtn" Command="{Binding StartReceivingCommand}" Width="80">Start</Button>            
+                <Button Command="{Binding StopReceivingCommand}" Width="80">Stop</Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding SelectedRadio}" IsEnabled="{Binding #StartBtn.IsEnabled}" Width="100" ItemsSource="{Binding Radios}"></ComboBox>
+            </StackPanel>
+         
         </StackPanel>
         
     </Grid>

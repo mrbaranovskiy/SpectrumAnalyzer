@@ -35,6 +35,7 @@ public interface ITransport<T>
     static int DefaultChunkSize { get; } = 1 << 14;
 }
 
+
 // var device = Device.UHD.GetDevice();
 // ITransport<transport> deviceStream = device.Start(properties); //restart
 // 
