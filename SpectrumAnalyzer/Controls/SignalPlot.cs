@@ -5,6 +5,7 @@ using System.Numerics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -31,7 +32,9 @@ public class SignalPlot : TemplatedControl
             ViewportWidth = (int)Width;
 
             if (sender is TemplatedControl { Height: > 0, Width: > 0 } ctrl)
+            {
                 _source = CreateBitmap(ctrl);
+            }
         };
 
         Loaded += (sender, args) =>

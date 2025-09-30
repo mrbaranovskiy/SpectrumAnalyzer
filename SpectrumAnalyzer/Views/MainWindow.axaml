@@ -40,14 +40,13 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Grid ShowGridLines="True" x:Name="rootGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  >
+    <Grid   VerticalAlignment="Stretch" >
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*"></RowDefinition>
-            <RowDefinition Height="5*"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="*" ></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
         </Grid.RowDefinitions>
-        
-            <global:SignalPlot Grid.Row="0" x:Name="SignalPlotChart" Background="AliceBlue"
+            <global:SignalPlot Grid.Row="0" x:Name="SignalPlotChart"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                MinX="{Binding MinFrequencyAxis}"
                                MaxX="{Binding MaxFrequencyAxis}"
@@ -61,9 +60,9 @@
                                ViewportHeight="{Binding FftCtrlHeight, Mode=OneWayToSource}"
                                ViewportWidth="{Binding FftCtrlWidth, Mode=OneWayToSource}"
             />
-        
-            <global:SignalPlot Grid.Row="1" x:Name="WaterflowPlotChart"
-                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+     
+            <global:SignalPlot x:Name="WaterflowPlotChart" Grid.Row="1" 
+                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                MinX="{Binding MinFrequencyAxis}"
                                MaxX="{Binding MaxFrequencyAxis}"
                                MinY="{Binding MinMagnitudeDbAxis}"
@@ -73,12 +72,9 @@
                                GridBrush="#404040" AxisBrush="#E0E0E0"
                                GridThickness="1" AxisThickness="1.5"
                                PlotPadding="40,16,16,28"
-                               Height="{Binding #rootGrid.Height}"
-                               Width="{Binding #rootGrid.Width}"
                                ViewportHeight="{Binding WaterfallCtrlHeight, Mode=OneWayToSource}"
                                ViewportWidth="{Binding WaterfallCtrlWidth, Mode=OneWayToSource}"
             />
-        
         
         <StackPanel Margin="10" Orientation="Horizontal" Grid.Row="2">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
@@ -86,7 +82,7 @@
                 <Button Command="{Binding StopReceivingCommand}" Width="80">Stop</Button>
             </StackPanel>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding SelectedRadio}" IsEnabled="{Binding #StartBtn.IsEnabled}" Width="100" ItemsSource="{Binding Radios}"></ComboBox>
+                <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding SelectedRadio}" IsEnabled="{Binding #StartBtn.IsEnabled}"  ItemsSource="{Binding Radios}"></ComboBox>
             </StackPanel>
          
         </StackPanel>

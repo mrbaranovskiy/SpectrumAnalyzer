@@ -48,7 +48,7 @@ public class FftRepresentation<TDrawingProperties>
         //there is no much sense to draw them all.
         // temporary I took 3 screen width. 
         // Mayne some Shannon theorem to avoid signal lost.
-        int numberOfDrawedPoints = 256;
+        int numberOfDrawedPoints = 512;
         var screenPointsMem = new Memory<Point>(screenPoints, 0, numberOfDrawedPoints);
 
         var resampledPower = ArrayPool<double>.Shared.Rent(numberOfDrawedPoints);

@@ -94,7 +94,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         FftCtrlWidth = 800;
         FftCtrlHeight = 300;
         SamplingRate = Bandwidth / 2;
-        CenterFrequency = 433_000_000;
+        CenterFrequency = 98_000_000;
         
         // this is redundant stuff
         MinFrequencyAxis = CenterFrequency;
@@ -119,7 +119,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             Antenna = "RX2",
             BandwidthHz = Bandwidth,
             CenterFrequencyHz = CenterFrequency,
-            GainDb = 40,
+            GainDb = 50,
             SampleRateHz = SamplingRate
         };
 
@@ -143,8 +143,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         _ = _transport.Start();
         _streamingPool.DataReceived += HandleDataUpdate;
-        this.StartReceivingCommand.NotifyCanExecuteChanged();
-        this.StopReceivingCommand.NotifyCanExecuteChanged();
+        StartReceivingCommand.NotifyCanExecuteChanged();
+        StopReceivingCommand.NotifyCanExecuteChanged();
         return Task.CompletedTask;
     }
 
