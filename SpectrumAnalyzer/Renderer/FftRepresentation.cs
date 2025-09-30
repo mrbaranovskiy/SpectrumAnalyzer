@@ -26,6 +26,9 @@ public class FftRepresentation<TDrawingProperties>
 
     public override void BuildRepresentation(ReadOnlySpan<Complex> data)
     {
+        if(Rendered)
+            return;
+        
         if (data.Length != SignalMemoryHandle.Length)
             throw new NotImplementedException("Implement resize");
         
@@ -45,7 +48,7 @@ public class FftRepresentation<TDrawingProperties>
         //there is no much sense to draw them all.
         // temporary I took 3 screen width. 
         // Mayne some Shannon theorem to avoid signal lost.
-        int numberOfDrawedPoints =  Math.Max(SignalBuffer.Length / 2, 1024);
+        int numberOfDrawedPoints = 256;
         var screenPointsMem = new Memory<Point>(screenPoints, 0, numberOfDrawedPoints);
 
         var resampledPower = ArrayPool<double>.Shared.Rent(numberOfDrawedPoints);
@@ -60,6 +63,8 @@ public class FftRepresentation<TDrawingProperties>
         var xs = resFreqMem.Span;
         
         Draw(screenPointsMem, ys, xs);
+        Rendered = true;
+        
         
         ArrayPool<Point>.Shared.Return(screenPoints, true); 
         ArrayPool<double>.Shared.Return(resampledPower, true);
@@ -75,7 +80,14 @@ public class FftRepresentation<TDrawingProperties>
         BitmapGraphics.DrawLines(BitmapMemoryHandle, generatePoints, Colors.Green);
     }
 
-    public override ReadOnlySpan<byte> CurrentFrame => BitmapMemoryHandle.Span;
+    public override ReadOnlySpan<byte> CurrentFrame
+    {
+        get
+        {
+            Rendered = false;
+            return BitmapMemoryHandle.Span;
+        }
+    }
 
     protected void GeneratePoints(Span<Point> output,
         ReadOnlySpan<double> ys,

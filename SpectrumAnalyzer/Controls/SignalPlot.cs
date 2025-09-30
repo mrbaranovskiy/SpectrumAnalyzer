@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Numerics;
 using Avalonia;
 using Avalonia.Controls;
@@ -162,8 +163,9 @@ public class SignalPlot : TemplatedControl
     {
         if(_source is null)
             return;
-        
+     
         UpdateData(Representation.CurrentFrame);
+
         var src = new Rect(-PlotPadding.Left,  PlotPadding.Bottom, Width - PlotPadding.Right , Height - PlotPadding.Top);
         var dst = new Rect(0,  0, Width  - PlotPadding.Right , Height - PlotPadding.Top);
         context.DrawImage(_source, src, dst);
@@ -174,7 +176,6 @@ public class SignalPlot : TemplatedControl
         using var fb = _source.Lock();
         var dst = new Span<byte>((void*)fb.Address, fb.RowBytes * fb.Size.Height);
         dst.Clear();
-        
         
         var srcStride = (int)Width * 4;
         if (fb.RowBytes == srcStride)

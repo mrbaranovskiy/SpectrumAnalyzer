@@ -17,6 +17,7 @@ public interface IRendererRepresentation<TData> : IDisposable where TData : stru
     /// <returns></returns>
     void BuildRepresentation(ReadOnlySpan<TData> span);
     ReadOnlySpan<byte> CurrentFrame { get; }
+    bool Rendered { get; }
 }
 
 
@@ -89,6 +90,7 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
 
     public abstract void BuildRepresentation(ReadOnlySpan<TData> data);
     public abstract ReadOnlySpan<byte> CurrentFrame { get; }
+    public bool Rendered { get; protected set; }
 
     protected abstract void HandleDrawingPropertiesUpdated();
 

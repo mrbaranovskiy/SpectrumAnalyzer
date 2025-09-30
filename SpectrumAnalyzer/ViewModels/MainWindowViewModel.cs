@@ -57,14 +57,12 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private double _waterfallCtrlHeight;
     private int _selectedRadio;
 
-
     public MainWindowViewModel(IDeviceConnection<Complex, UsrpConnectionProperties> usrpConnection)
     {
         _usrpConnection = usrpConnection;
         _representations = [];
         //set some defaults
       
-        
         _fftProperties = new FFTDrawingProperties(
             ITransport<Complex>.DefaultChunkSize,
             100,
@@ -335,7 +333,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         
         _waterfallRepresentation.UpdateDrawingProperties(_waterfallDrawingProperties);
     }
-
+    
     private void HandleDataUpdate(object? sender, DataReceivedEventArgs e)
     {
         _renderer?.Render();
