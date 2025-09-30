@@ -50,18 +50,19 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AVisual_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FSourcesCache_003Ff21da65c538965becaa88f01977dc549cd9e47d5b7c41263e55fff53973ad3_003FVisual_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AVisual_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FSourcesCache_003Ff21da65c538965becaa88f01977dc549cd9e47d5b7c41263e55fff53973ad3_003FVisual_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AWriteableBitmap_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FSourcesCache_003F396b2d4439eeae90b5b173f9c928dd099aca0a7724781cd851db6cccc18e517_003FWriteableBitmap_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=119c7427_002Dbb16_002D49c9_002Db055_002Dc412009c4a24/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ComplexRemapGivesCorrectValues" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=119c7427_002Dbb16_002D49c9_002Db055_002Dc412009c4a24/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ComplexRemapGivesCorrectValues" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.UtilitiesTests.ComplexRemapGivesCorrectValues&lt;/TestId&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.UtilitiesTests.ComplexRemapGivesCorrectValuesScaled&lt;/TestId&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.SignalUtilitiesTest.TestInterpolation&lt;/TestId&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.UhdTest.ConnectToDeviceTest&lt;/TestId&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.Services.StreamingPoolTests.TestStreamingDataPool&lt;/TestId&gt;
+    &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.UtilitiesTests&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d3df603a_002Dd118_002D4b1f_002Da45e_002Dec0f27707f42/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestMethod1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d3df603a_002Dd118_002D4b1f_002Da45e_002Dec0f27707f42/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestMethod1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.UtilitiesTests.MapperGivesCorrectValues&lt;/TestId&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.UtilitiesTests.ComplexRemapGivesCorrectValues&lt;/TestId&gt;

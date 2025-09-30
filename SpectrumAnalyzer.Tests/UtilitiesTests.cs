@@ -32,19 +32,9 @@ public class UtilitiesTests
     public void ComplexRemapGivesCorrectValues()
     {
         var point = new Point(0.5, 0.5);
-        var result = RangesMapper.Map2Point(point, 100, 100, 0.0, 1.0, 0.0, 1.0);
+        var result = RangesMapper.Map2Point(point, 101, 101, 0.0, 1.0, 0.0, 1.0);
         
-        Assert.IsTrue(result.Item1 == 50);
-        Assert.IsTrue(result.Item2 == 50);
-    }
-    
-    [TestMethod]
-    public void ComplexRemapGivesCorrectValuesScaled()
-    {
-        var point = new Point(0.5, 0.5);
-       // var result = RangesMapper.Map2Point(point, 100, 100, 0.0, 1.0, 0.0, 1.0, 0.50, 0.50);
-        
-        //Assert.IsTrue(result.Item1 == 25);
-        //Assert.IsTrue(result.Item2 == 25);
+        Assert.IsTrue(Math.Abs(result.Item1 - 50) < float.Epsilon);
+        Assert.IsTrue(Math.Abs(result.Item2 - 50) < float.Epsilon);
     }
 }

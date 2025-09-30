@@ -158,7 +158,6 @@ public class SignalPlot : TemplatedControl
 
     public IBrush LabelBrush { get => GetValue(LabelBrushProperty); set => SetValue(LabelBrushProperty, value); }
     public Thickness PlotPadding { get => GetValue(PlotPaddingProperty); set => SetValue(PlotPaddingProperty, value); }
-    private int cnt = 0;
     public override void Render(DrawingContext context)
     {
         if(_source is null)

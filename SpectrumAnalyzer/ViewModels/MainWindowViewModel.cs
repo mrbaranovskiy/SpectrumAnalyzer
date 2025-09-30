@@ -88,7 +88,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _waterfallRepresentation = new WaterfallRepresentation(_waterfallDrawingProperties);
         _fftRepresentation = new FftRepresentation<FFTDrawingProperties>(_fftProperties);
 
-        MinMagnitudeDbAxis = -80;
+        MinMagnitudeDbAxis = -100;
         MaxMagnitudeDbAxis = 0;
         Bandwidth = 10_000_000;
         MinFrequencyAxis = 0;
