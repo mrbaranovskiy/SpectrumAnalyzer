@@ -16,6 +16,8 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         UpdateDrawingProperties(properties);
     }
 
+    protected override int NumberOfPointsToDraw => 1024;
+
     public override void InitBuffers()
     {
         base.InitBuffers();

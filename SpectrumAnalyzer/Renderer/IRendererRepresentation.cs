@@ -53,6 +53,8 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
         }
     }
 
+    protected virtual int NumberOfPointsToDraw => 512;
+
     public void UpdateDrawingProperties(TDrawingProperties properties)
     {
         if(properties.Width <= 0 || properties.Height <= 0)

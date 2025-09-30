@@ -84,6 +84,10 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
                 <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding SelectedRadio}" IsEnabled="{Binding #StartBtn.IsEnabled}"  ItemsSource="{Binding Radios}"></ComboBox>
             </StackPanel>
+            
+            <!-- <StackPanel  Orientation="Horizontal" VerticalAlignment="Top"> -->
+            <!--     <TextBox Text="{Binding CenterFrequency}"></TextBox> -->
+            <!-- </StackPanel> -->
          
         </StackPanel>
         

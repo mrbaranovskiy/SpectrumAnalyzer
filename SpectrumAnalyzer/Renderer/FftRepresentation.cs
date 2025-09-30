@@ -48,15 +48,14 @@ public class FftRepresentation<TDrawingProperties>
         //there is no much sense to draw them all.
         // temporary I took 3 screen width. 
         // Mayne some Shannon theorem to avoid signal lost.
-        var numberOfDrawedPoints = 512;
-        var screenPointsMem = new Memory<Point>(screenPoints, 0, numberOfDrawedPoints);
+        var screenPointsMem = new Memory<Point>(screenPoints, 0, NumberOfPointsToDraw);
 
-        var resampledPower = ArrayPool<double>.Shared.Rent(numberOfDrawedPoints);
-        var resPowerMem = new Memory<double>(resampledPower, 0, numberOfDrawedPoints);
+        var resampledPower = ArrayPool<double>.Shared.Rent(NumberOfPointsToDraw);
+        var resPowerMem = new Memory<double>(resampledPower, 0, NumberOfPointsToDraw);
         SignalDecimation.ResampleData(power, resPowerMem.Span);
         
-        var resampledFreq = ArrayPool<double>.Shared.Rent(numberOfDrawedPoints);
-        var resFreqMem = new Memory<double>(resampledFreq, 0, numberOfDrawedPoints);
+        var resampledFreq = ArrayPool<double>.Shared.Rent(NumberOfPointsToDraw);
+        var resFreqMem = new Memory<double>(resampledFreq, 0, NumberOfPointsToDraw);
         SignalDecimation.ResampleData(freq, resFreqMem.Span);
         
         var ys = resPowerMem.Span;
