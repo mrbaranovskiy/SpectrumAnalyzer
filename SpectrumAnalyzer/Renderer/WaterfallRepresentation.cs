@@ -69,6 +69,8 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         
         // copy it to circular buf
         // copy everything to the bitmap.
+        
+        //todo: better to shift the display buffer 
 
         var tempCycleIndex = _cycleIndex;
         for (int i = DrawingProperties.Height - 1; i >= 0; i--)
@@ -116,5 +118,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
 
     protected override void HandleDrawingPropertiesUpdated()
     {
+        // todo: need to resample the data in the circle buffer.
+        // reapply it.
     }
 }

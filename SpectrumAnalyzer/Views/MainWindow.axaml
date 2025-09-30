@@ -51,7 +51,7 @@
                            MaxX="{Binding MaxFrequencyAxis}"
                            MinY="{Binding MinMagnitudeDbAxis}"
                            MaxY="{Binding MaxMagnitudeDbAxis}"
-                           Representation="{Binding WaterfallRepresentation}"
+                           Representation="{Binding FftRepresentation}"
                            GridDivisionsX="10" GridDivisionsY="8"
                            GridBrush="#404040" AxisBrush="#E0E0E0"
                            GridThickness="1" AxisThickness="1.5"

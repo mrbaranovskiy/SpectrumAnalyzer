@@ -40,22 +40,28 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public MainWindowViewModel(IDeviceConnection<Complex, UsrpConnectionProperties> usrpConnection)
     {
         _usrpConnection = usrpConnection;
-        _representations = new List<IRendererRepresentation<Complex>>();
+        _representations = [];
+        //set some defaults
+      
         
         _fftProperties = new FFTDrawingProperties(
             ITransport<Complex>.DefaultChunkSize,
             100,
             100,
             Bandwidth,
-            CenterFrequency
-            , SamplingRate,
-            new AxisRange(-120, 30),
-            new AxisRange(0, Bandwidth));
+            CenterFrequency,
+            SamplingRate,
+            new AxisRange(-80, 10),
+            new AxisRange(CenterFrequency,
+                CenterFrequency + SamplingRate / 2));
 
         _waterfallDrawingProperties = new WaterfallDrawingProperties(ITransport<Complex>.DefaultChunkSize,
-            100, 100, Bandwidth, CenterFrequency, SamplingRate,
-            new AxisRange(-120, 30),
-            new AxisRange(0, Bandwidth)
+            100, 100,
+            Bandwidth,
+            CenterFrequency, SamplingRate,
+            new AxisRange(-80, 10),
+            new AxisRange(CenterFrequency - SamplingRate,
+                CenterFrequency + SamplingRate)
         );
 
         _waterfallRepresentation = new WaterfallRepresentation(_waterfallDrawingProperties);
@@ -71,8 +77,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         SamplingRate = Bandwidth / 2;
         CenterFrequency = 433_000_000;
         
-        //_representations.Add(_fftRepresentation);
-        _representations.Add(_waterfallRepresentation);
+        // this is redundant stuff
+        MinFrequencyAxis = CenterFrequency;
+        MaxFrequencyAxis = CenterFrequency + SamplingRate / 2;
+        _representations.Add(_fftRepresentation);
+        //_representations.Add(_waterfallRepresentation);
     }
 
     [RelayCommand]
@@ -82,7 +91,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             return;
         
         // it is stupid.... but i have no much time to 
-        // implement different devices. Device manager and so on..
+        // implement different devices, device manager and so on..
         var connectionProps = new UsrpConnectionProperties
         {
             Antenna = "TX/RX",
@@ -91,7 +100,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             GainDb = 20,
             SampleRateHz = SamplingRate
         };
-
         
         _transport = _usrpConnection.BuildConnection(connectionProps);
         _transport.ReceivingChunkSize = ITransport<Complex>.DefaultChunkSize;
@@ -243,6 +251,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     private void UpdateFftProperties()
     {
+        if (_fftProperties is null)
+            _fftProperties = new FFTDrawingProperties(0,0,0,0,0,0, new AxisRange(0,0), new AxisRange());
         _fftProperties = _fftProperties with
         {
             Width = (int)FftCtrlWidth,
@@ -250,7 +260,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             Bandwidth = Bandwidth,
             CenterFrequency = CenterFrequency,
             SamplingRate = SamplingRate,
-            XAxisRange = new AxisRange(_minFrequencyAxis, _maxFrequencyAxis),
+            XAxisRange = new AxisRange(_centerFrequency - SamplingRate, _centerFrequency + SamplingRate),
             YAxisRange = new AxisRange(_minMagnitudeDbAxis, _maxMagnitudeDbAxis)
         };
         

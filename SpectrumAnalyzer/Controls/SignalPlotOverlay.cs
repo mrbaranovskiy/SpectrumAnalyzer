@@ -80,7 +80,6 @@ internal class SignalPlotOverlay : Control
             Math.Max(0, r.Width - PlotPadding.Left - PlotPadding.Right),
             Math.Max(0, r.Height - PlotPadding.Top - PlotPadding.Bottom));
 
-        // Draw grid
         if (inner.Width > 0 && inner.Height > 0)
         {
             var gridPen = new Pen(GridBrush, GridThickness);

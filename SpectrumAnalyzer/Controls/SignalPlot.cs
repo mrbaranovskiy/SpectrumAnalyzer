@@ -75,10 +75,6 @@ public class SignalPlot : TemplatedControl
         get => _viewportHeight;
         set => SetAndRaise(ViewportHeightProperty, ref _viewportHeight, value);
     }
-
-
-   
-
     
     public static readonly StyledProperty<double> MinXProperty =
         AvaloniaProperty.Register<SignalPlot, double>(nameof(MinX), 0);
@@ -152,19 +148,19 @@ public class SignalPlot : TemplatedControl
         if(_source is null)
             return;
         
-        //_source.FillSolid(Color.FromRgb(255, 255, 0));
         UpdateData(Representation.CurrentFrame);
-        var src = new Rect(-PlotPadding.Left,  PlotPadding.Bottom, Width - PlotPadding.Left, Height);
-        var dst = new Rect(Bounds.Size);
-        
+        var src = new Rect(-PlotPadding.Left,  PlotPadding.Bottom, Width - PlotPadding.Right , Height - PlotPadding.Top);
+        var dst = new Rect(0,  0, Width  - PlotPadding.Right , Height - PlotPadding.Top);
+        // _source.FillSolid(Colors.BlueViolet);        
         context.DrawImage(_source, src, dst);
     }
-    
-    public unsafe void UpdateData(ReadOnlySpan<byte> bgra)
+
+    private unsafe void UpdateData(ReadOnlySpan<byte> bgra)
     {
         using var fb = _source.Lock();
         var dst = new Span<byte>((void*)fb.Address, fb.RowBytes * fb.Size.Height);
         dst.Clear();
+        
         
         var srcStride = (int)Width * 4;
         if (fb.RowBytes == srcStride)

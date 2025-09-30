@@ -68,6 +68,7 @@ public class FftRepresentation<TDrawingProperties>
 
     protected override void Draw(Memory<Point> generatePoints, Span<double> ys, Span<double> xs)
     {
+        BitmapMemoryHandle.Span.Clear();
         GeneratePoints(generatePoints.Span, ys, xs );
 
         // _bitmapGraphics.DrawLines(_bitmapMemoryHandle.Span, screenPointsMem.Span, Colors.White);
@@ -87,7 +88,8 @@ public class FftRepresentation<TDrawingProperties>
                 DrawingProperties.Width,
                 DrawingProperties.YAxisRange.Min,
                 DrawingProperties.YAxisRange.Max,
-                DrawingProperties.XAxisRange.Min,
+                0,
+                // ReSharper disable once PossibleLossOfFraction
                 DrawingProperties.SamplingRate / 2
             );
             
