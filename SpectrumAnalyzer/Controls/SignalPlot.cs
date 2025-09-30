@@ -13,6 +13,7 @@ using SpectrumAnalyzer.Utilities;
 using Brushes = Avalonia.Media.Brushes;
 using Color = Avalonia.Media.Color;
 using Point = Avalonia.Point;
+using Size = Avalonia.Size;
 using Vector = Avalonia.Vector;
 
 namespace SpectrumAnalyzer.Controls;
@@ -34,12 +35,27 @@ public class SignalPlot : TemplatedControl
 
         Loaded += (sender, args) =>
         {
+            if (sender is TemplatedControl { Height: Double.NaN, Width: Double.NaN } ctrl)
+            {
+                Height = ctrl.Bounds.Height;
+                Width = ctrl.Bounds.Width;
+            }
+            
+            ViewportHeight = (int)Height;
+            ViewportWidth = (int)Width;
+
+           _source = CreateBitmap((TemplatedControl)sender);
+        };
+
+        TemplateApplied += (sender, args) =>
+        {
             ViewportHeight = (int)Height;
             ViewportWidth = (int)Width;
 
 
             if (sender is TemplatedControl { Height: > 0, Width: > 0 } ctrl)
                 _source = CreateBitmap(ctrl);
+
         };
     }
 
@@ -151,7 +167,6 @@ public class SignalPlot : TemplatedControl
         UpdateData(Representation.CurrentFrame);
         var src = new Rect(-PlotPadding.Left,  PlotPadding.Bottom, Width - PlotPadding.Right , Height - PlotPadding.Top);
         var dst = new Rect(0,  0, Width  - PlotPadding.Right , Height - PlotPadding.Top);
-        // _source.FillSolid(Colors.BlueViolet);        
         context.DrawImage(_source, src, dst);
     }
 

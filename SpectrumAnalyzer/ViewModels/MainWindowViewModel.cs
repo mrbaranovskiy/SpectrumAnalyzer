@@ -37,6 +37,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private double _fftCtrlWidth;
     private double _fftCtrlHeight;
 
+    private double _waterfallCtrlWidth;
+    private double _waterfallCtrlHeight;
+
+
     public MainWindowViewModel(IDeviceConnection<Complex, UsrpConnectionProperties> usrpConnection)
     {
         _usrpConnection = usrpConnection;
@@ -81,7 +85,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         MinFrequencyAxis = CenterFrequency;
         MaxFrequencyAxis = CenterFrequency + SamplingRate / 2;
         _representations.Add(_fftRepresentation);
-        //_representations.Add(_waterfallRepresentation);
+        _representations.Add(_waterfallRepresentation);
     }
 
     [RelayCommand]
@@ -187,6 +191,26 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             UpdateFftProperties();
         }
     }
+    
+    public double WaterfallCtrlWidth
+    {
+        get => _waterfallCtrlWidth;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _waterfallCtrlWidth, value);
+            UpdateFftProperties();
+        }
+    }
+    
+    public double WaterfallCtrlHeight
+    {
+        get => _waterfallCtrlHeight;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _waterfallCtrlHeight, value);
+            UpdateFftProperties();
+        }
+    }
 
     public double FftCtrlWidth
     {
@@ -269,8 +293,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         _waterfallDrawingProperties = _waterfallDrawingProperties with
         {
-            Width = (int)FftCtrlWidth,
-            Height = (int)FftCtrlHeight,
+            Width = (int)WaterfallCtrlWidth,
+            Height = (int)WaterfallCtrlHeight,
             Bandwidth = Bandwidth,
             CenterFrequency = CenterFrequency,
             SamplingRate = SamplingRate,

@@ -130,7 +130,8 @@ internal class SignalPlotOverlay : Control
                 ctx.DrawLine(axisPen, new Point(inner.Left - 4, y), new Point(inner.Left, y));
 
                 double yv = MinY + t * (MaxY - MinY);
-                DrawLabel(ctx, $"{yv:0.###}", new Point(inner.Left - 6, y), hAlignRight: true, vAlignCenter: true);
+                //todo: calculate magnitude.
+                //DrawLabel(ctx, $"{yv:0.###}", new Point(inner.Left - 6, y), hAlignRight: true, vAlignCenter: true);
             }
         }
     }

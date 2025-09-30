@@ -40,29 +40,47 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  >
+    <Grid ShowGridLines="True" x:Name="rootGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  >
         <Grid.RowDefinitions>
-            <RowDefinition Height="10*"></RowDefinition>
+            <RowDefinition Height="5*"></RowDefinition>
+            <RowDefinition Height="5*"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
-        <global:SignalPlot x:Name="SignalPlotChart"
-                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                           MinX="{Binding MinFrequencyAxis}"
-                           MaxX="{Binding MaxFrequencyAxis}"
-                           MinY="{Binding MinMagnitudeDbAxis}"
-                           MaxY="{Binding MaxMagnitudeDbAxis}"
-                           Representation="{Binding FftRepresentation}"
-                           GridDivisionsX="10" GridDivisionsY="8"
-                           GridBrush="#404040" AxisBrush="#E0E0E0"
-                           GridThickness="1" AxisThickness="1.5"
-                           PlotPadding="40,16,16,28"
-                           Height="{Binding #wnd.Height}"
-                           Width="{Binding #wnd.Width}"
-                           ViewportHeight="{Binding FftCtrlHeight, Mode=OneWayToSource}"
-                           ViewportWidth="{Binding FftCtrlWidth, Mode=OneWayToSource}"
-        />
         
-        <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <global:SignalPlot Grid.Row="0" x:Name="SignalPlotChart" Background="AliceBlue"
+                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                               MinX="{Binding MinFrequencyAxis}"
+                               MaxX="{Binding MaxFrequencyAxis}"
+                               MinY="{Binding MinMagnitudeDbAxis}"
+                               MaxY="{Binding MaxMagnitudeDbAxis}"
+                               Representation="{Binding FftRepresentation}"
+                               GridDivisionsX="10" GridDivisionsY="8"
+                               GridBrush="#404040" AxisBrush="#E0E0E0"
+                               GridThickness="1" AxisThickness="1.5"
+                               PlotPadding="40,16,16,28"
+                               ViewportHeight="{Binding FftCtrlHeight, Mode=OneWayToSource}"
+                               ViewportWidth="{Binding FftCtrlWidth, Mode=OneWayToSource}"
+            />
+        
+            <global:SignalPlot Grid.Row="1" x:Name="WaterflowPlotChart"
+                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                               MinX="{Binding MinFrequencyAxis}"
+                               MaxX="{Binding MaxFrequencyAxis}"
+                               MinY="{Binding MinMagnitudeDbAxis}"
+                               MaxY="{Binding MaxMagnitudeDbAxis}"
+                               Representation="{Binding WaterfallRepresentation}"
+                               GridDivisionsX="10" GridDivisionsY="8"
+                               GridBrush="#404040" AxisBrush="#E0E0E0"
+                               GridThickness="1" AxisThickness="1.5"
+                               PlotPadding="40,16,16,28"
+                               Height="{Binding #rootGrid.Height}"
+                               Width="{Binding #rootGrid.Width}"
+                               ViewportHeight="{Binding WaterfallCtrlHeight, Mode=OneWayToSource}"
+                               ViewportWidth="{Binding WaterfallCtrlWidth, Mode=OneWayToSource}"
+            />
+        
+        
+        <StackPanel  Orientation="Horizontal" Grid.Row="2">
             <Button Command="{Binding StartReceivingCommand}" Width="80">Start</Button>            
             <Button Command="{Binding StopReceivingCommand}" Width="80">Stop</Button>            
             <Button Command="{Binding RestartCommand}" Width="80">Restart</Button>            
