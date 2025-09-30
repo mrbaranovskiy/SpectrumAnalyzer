@@ -23,6 +23,11 @@ public sealed class BitmapGraphics
     {
         return new BitmapGraphics(width, height, factor);
     }
+
+    private  void ApplyKernel(Span<byte> image)
+    {
+        
+    }
     
     private static int Round(float n)
     {
@@ -39,8 +44,8 @@ public sealed class BitmapGraphics
 
         var step = Math.Abs(Math.Abs(dx) > Math.Abs(dy) ? dx : dy);
 
-        var x_incr = (float)dx / step;
-        var y_incr = (float)dy / step;
+        var xIncr = (float)dx / step;
+        var yIncr = (float)dy / step;
         
         var x = (float)p0.X;
         var y = (float)p0.Y;
@@ -59,8 +64,57 @@ public sealed class BitmapGraphics
             }
             
             // should we increment anyway??
-            x += x_incr;
-            y += y_incr;
+            x += xIncr;
+            y += yIncr;
+        }
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private void DrawLine(Span<byte> image, Point p0, Point p1, uint color, int thickness)
+    {
+        var dx = (int)(p1.X - p0.X);
+        var dy = (int)(p1.Y - p0.Y);
+
+        var step = Math.Abs(Math.Abs(dx) > Math.Abs(dy) ? dx : dy);
+
+        var xIncr = (float)dx / step;
+        var yIncr = (float)dy / step;
+
+        var x = (float)p0.X;
+        var y = (float)p0.Y;
+
+        var radius = Math.Max(1, thickness / 2);
+
+        for (var i = 0; i < step; i++)
+        {
+            var nextPoint = new Point(Round(x), Round(y));
+
+            for (var oy = -radius; oy <= radius; oy++)
+            {
+                for (var ox = -radius; ox <= radius; ox++)
+                {
+                    if (ox * ox + oy * oy <= radius * radius) 
+                    {
+                        var px = (int)(nextPoint.X + ox);
+                        var py = (int)(nextPoint.Y + oy);
+
+                        if (px >= 0 && px < _width && py >= 0 && py < _height)
+                        {
+                            var pos = (py * _width + px) * 4;
+                            if (pos + 3 < image.Length && pos >= 0)
+                            {
+                                image[pos + 3] = (byte)((color & 0xFF000000) >> 24); // A
+                                image[pos + 0] = (byte)((color & 0x00FF0000) >> 16); // R
+                                image[pos + 1] = (byte)((color & 0x0000FF00) >> 8);  // G
+                                image[pos + 2] = (byte)(color & 0x000000FF);          // B
+                            }
+                        }
+                    }
+                }
+            }
+
+            x += xIncr;
+            y += yIncr;
         }
     }
 
@@ -71,7 +125,7 @@ public sealed class BitmapGraphics
             var p1 = points[i - 1];
             var p2 = points[i];
            
-            DrawLine(image, p1, p2, color.ToUInt32());
+            DrawLine(image, p1, p2, color.ToUInt32(), 2);
         }
     }
     
@@ -81,7 +135,7 @@ public sealed class BitmapGraphics
         {
             var p1 = points.Span[i - 1];
             var p2 = points.Span[i];
-            DrawLine(image.Span, p1, p2, color.ToUInt32());
+            DrawLine(image.Span, p1, p2, color.ToUInt32(),2);
         });
         
         // for (var i = 1; i < points.Length; i++)

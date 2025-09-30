@@ -48,8 +48,12 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
 
             var fromIdx = Convert.ToInt32(prev.X) * 4;
             var toIdx = Convert.ToInt32(pt.X) * 4;
-            //var color = SampleColor(prev.Y);
-            var color = SampleMagnitude(magnitudes[i]);
+            
+            // it would be much easier to do this on GPU... 
+            var curColor = SampleMagnitudeColor(magnitudes[i]);
+            var prevColor = SampleMagnitudeColor(magnitudes[i]);
+
+            var color = Lerp(curColor, prevColor, 0.5f);
             
             if (fromIdx == toIdx)
             {
@@ -60,7 +64,6 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
             }
             else
             {
-                
                 var drawUnit = row.Slice(fromIdx, toIdx - fromIdx);
                 for (var j = 0; j < drawUnit.Length; j+=4)
                 {
@@ -100,7 +103,6 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         _cycleIndex = ++_cycleIndex % DrawingProperties.Height;
     }
 
-
     private List<Color> _colorRange =
     [
         Color.Parse("#0000ff"),
@@ -110,7 +112,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         Color.Parse("#ff0000"),
     ];
 
-    private Color SampleMagnitude(double mag)
+    private Color SampleMagnitudeColor(double mag)
     {
         var point = (float)Math.Clamp(Utilities.RangesMapper.Remap(mag,
             DrawingProperties.YAxisRange.Min,
@@ -125,14 +127,6 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
             return _colorRange[low];
         
         return Lerp(_colorRange[low], _colorRange[high], point);
-    }
-    
-    
-    private Color SampleColor(double h)
-    {
-        var max = DrawingProperties.Height;
-        var level = (float)Math.Clamp( (h) /  max, 0, 1);
-        return Lerp(Colors.Yellow, Colors.Black, level);
     }
     
     private static Color Lerp(Color startColor, Color endColor, float amount)
