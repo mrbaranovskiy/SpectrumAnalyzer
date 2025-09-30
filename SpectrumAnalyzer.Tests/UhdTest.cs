@@ -8,7 +8,7 @@ public class UhdTest
     static string GetErr(IntPtr h)
     {
         var buf = new byte[1024];
-        int n = UsrpNative.usrp_get_last_error(h, buf, buf.Length);
+        var n = UsrpNative.usrp_get_last_error(h, buf, buf.Length);
         return n > 0 ? System.Text.Encoding.UTF8.GetString(buf, 0, n) : "";
     }
     

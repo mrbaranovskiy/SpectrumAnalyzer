@@ -48,7 +48,7 @@ public class FftRepresentation<TDrawingProperties>
         //there is no much sense to draw them all.
         // temporary I took 3 screen width. 
         // Mayne some Shannon theorem to avoid signal lost.
-        int numberOfDrawedPoints = 512;
+        var numberOfDrawedPoints = 512;
         var screenPointsMem = new Memory<Point>(screenPoints, 0, numberOfDrawedPoints);
 
         var resampledPower = ArrayPool<double>.Shared.Rent(numberOfDrawedPoints);
@@ -93,7 +93,7 @@ public class FftRepresentation<TDrawingProperties>
         ReadOnlySpan<double> ys,
         ReadOnlySpan<double> xs)
     {
-        for (int i = 0; i < ys.Length; i++)
+        for (var i = 0; i < ys.Length; i++)
         {
             var scaledPt = RangesMapper.Map2Point(new Point(xs[i], ys[i]), 
                 DrawingProperties.Height,

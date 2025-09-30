@@ -40,10 +40,10 @@ public class FakeTransport(UsrpConnectionProperties properties, int len) : ITran
             var target = sr / 4;
 
             // this is stupid way... would be nice to have smt with more harmonics...
-            for (int i = 0; i < 10; i++) 
+            for (var i = 0; i < 10; i++) 
                 FftSharp.SampleData.AddSin(_buffer,(int)properties.SampleRateHz, target + i* Random.Shared.NextInt64(1,5) ,1);
 
-            for (int i = 0; i < 30; i++)
+            for (var i = 0; i < 30; i++)
             {
                 FftSharp.SampleData.AddSin(_buffer,(int)properties.SampleRateHz, 
                     Random.Shared.NextInt64(1000, (long)(properties.SampleRateHz / 2)) ,0.0001);

@@ -8,7 +8,7 @@ namespace SpectrumAnalyzer.Controls;
 
 internal class SignalPlotOverlay : Control
 {
-    // Bind-through properties (come from SignalPlot via TemplateBinding)
+    
     public static readonly StyledProperty<double> MinXProperty =
         AvaloniaProperty.Register<SignalPlotOverlay, double>(nameof(MinX), 0);
     public static readonly StyledProperty<double> MaxXProperty =
@@ -87,18 +87,18 @@ internal class SignalPlotOverlay : Control
 
             if (GridDivisionsX > 0)
             {
-                for (int i = 0; i <= GridDivisionsX; i++)
+                for (var i = 0; i <= GridDivisionsX; i++)
                 {
-                    double x = inner.X + inner.Width * i / GridDivisionsX;
+                    var x = inner.X + inner.Width * i / GridDivisionsX;
                     ctx.DrawLine(gridPen, new Point(x, inner.Top), new Point(x, inner.Bottom));
                 }
             }
 
             if (GridDivisionsY > 0)
             {
-                for (int j = 0; j <= GridDivisionsY; j++)
+                for (var j = 0; j <= GridDivisionsY; j++)
                 {
-                    double y = inner.Y + inner.Height * j / GridDivisionsY;
+                    var y = inner.Y + inner.Height * j / GridDivisionsY;
                     ctx.DrawLine(gridPen, new Point(inner.Left, y), new Point(inner.Right, y));
                 }
             }
@@ -108,28 +108,28 @@ internal class SignalPlotOverlay : Control
             ctx.DrawLine(axisPen, new Point(inner.Left, inner.Top), new Point(inner.Left, inner.Bottom));
             ctx.DrawLine(axisPen, new Point(inner.Right, inner.Top), new Point(inner.Right, inner.Bottom));
 
-            int xTickCount = GridDivisionsX;
-            int yTickCount = GridDivisionsY;
+            var xTickCount = GridDivisionsX;
+            var yTickCount = GridDivisionsY;
 
-            for (int i = 0; i <= xTickCount; i++)
+            for (var i = 0; i <= xTickCount; i++)
             {
-                double t = (double)i / xTickCount;
-                double x = inner.X + t * inner.Width;
+                var t = (double)i / xTickCount;
+                var x = inner.X + t * inner.Width;
 
                 ctx.DrawLine(axisPen, new Point(x, inner.Bottom), new Point(x, inner.Bottom + 4));
 
-                double xv = MinX + t * (MaxX - MinX);
+                var xv = MinX + t * (MaxX - MinX);
                 DrawLabel(ctx, $"{xv:0.###}", new Point(x, inner.Bottom + 6), hAlignCenter: true, vAlignTop: true);
             }
 
-            for (int j = 0; j <= yTickCount; j++)
+            for (var j = 0; j <= yTickCount; j++)
             {
-                double t = (double)j / yTickCount;
-                double y = inner.Y + (1 - t) * inner.Height;
+                var t = (double)j / yTickCount;
+                var y = inner.Y + (1 - t) * inner.Height;
 
                 ctx.DrawLine(axisPen, new Point(inner.Left - 4, y), new Point(inner.Left, y));
 
-                double yv = MinY + t * (MaxY - MinY);
+                var yv = MinY + t * (MaxY - MinY);
                 //todo: calculate magnitude.
                 //DrawLabel(ctx, $"{yv:0.###}", new Point(inner.Left - 6, y), hAlignRight: true, vAlignCenter: true);
             }

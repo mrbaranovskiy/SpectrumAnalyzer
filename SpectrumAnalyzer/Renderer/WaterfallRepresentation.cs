@@ -39,7 +39,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         var startIndex = _cycleIndex * DrawingProperties.Width * 4;
         var row = _cyclicScreenBufferMemory.Slice(startIndex, DrawingProperties.Width * 4);
         
-        for (int i = 1; i < generatePoints.Length; i++)
+        for (var i = 1; i < generatePoints.Length; i++)
         {
             var prev =  generatePoints.Span[i - 1];
             var pt =  generatePoints.Span[i];
@@ -60,7 +60,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
             {
                 
                 var drawUnit = row.Slice(fromIdx, toIdx - fromIdx);
-                for (int j = 0; j < drawUnit.Length; j+=4)
+                for (var j = 0; j < drawUnit.Length; j+=4)
                 {
                     drawUnit.Span[j + 0] = color.R;
                     drawUnit.Span[j + 1] = color.G;
@@ -76,7 +76,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         //todo: better to shift the display buffer 
 
         var tempCycleIndex = _cycleIndex;
-        for (int i = DrawingProperties.Height - 1; i >= 0; i--)
+        for (var i = DrawingProperties.Height - 1; i >= 0; i--)
         {
             var idxInCycleBuffer = tempCycleIndex * DrawingProperties.Width * 4;
             var indexInBtmBuffer = i * DrawingProperties.Width * 4;
@@ -137,10 +137,10 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
     {
         amount = Math.Clamp(amount, 0f, 1f);
 
-        byte r = (byte)(startColor.R + (endColor.R - startColor.R) * amount);
-        byte g = (byte)(startColor.G + (endColor.G - startColor.G) * amount);
-        byte b = (byte)(startColor.B + (endColor.B - startColor.B) * amount);
-        byte a = (byte)(startColor.A + (endColor.A - startColor.A) * amount);
+        var r = (byte)(startColor.R + (endColor.R - startColor.R) * amount);
+        var g = (byte)(startColor.G + (endColor.G - startColor.G) * amount);
+        var b = (byte)(startColor.B + (endColor.B - startColor.B) * amount);
+        var a = (byte)(startColor.A + (endColor.A - startColor.A) * amount);
 
         return Color.FromArgb(a, r, g, b);
     }

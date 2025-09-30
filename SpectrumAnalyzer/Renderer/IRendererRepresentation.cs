@@ -13,7 +13,7 @@ public interface IRendererRepresentation<TData> : IDisposable where TData : stru
     /// <summary>
     /// Builds the representation
     /// </summary>
-    /// <param name="output"></param>
+    /// <param name="span"></param>
     /// <returns></returns>
     void BuildRepresentation(ReadOnlySpan<TData> span);
     ReadOnlySpan<byte> CurrentFrame { get; }

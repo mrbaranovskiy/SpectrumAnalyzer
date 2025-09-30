@@ -60,7 +60,7 @@ public class StreamingPoolTests
         
         render.AddRepresentation(wf);
         
-        for (int i = 0; i < 240; i++)
+        for (var i = 0; i < 240; i++)
         {
             render.Render();
             await Task.Delay(20);

@@ -18,7 +18,7 @@ public class UsrpApi : IDeviceNativeApi<float>
 
     public string GetLastError()
     {
-        byte[] buffer = new byte[1024];
+        var buffer = new byte[1024];
         UsrpNative.usrp_get_last_error(_handle, buffer, buffer.Length);
         
         return Encoding.UTF8.GetString(buffer, 0, buffer.Length);

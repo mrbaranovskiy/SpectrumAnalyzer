@@ -17,21 +17,15 @@ public static class RangesMapper
 
         return remappedValue;
     }
-
-    // public static (double, double) Map2Point(
-    //     in Point point,
-    //     double screen_h, double screen_w,
-    //     double y_min, double y_max,
-    //     double x_min, double x_max,
-    //     double factor_x = 1.0, double factor_y = 1.0)
-    // {
-    //     var yr = Remap(point.Y, y_min, y_max, 0, screen_h) * factor_y;
-    //     var xr = Remap(point.X, x_min, x_max, 0, screen_w) * factor_x;
-    //     
-    //     return (xr, yr);
-    // }
     
-    private static double Clamp01(double v) => v < 0 ? 0 : (v > 1 ? 1 : v);
+    /// <summary>
+    /// Just clamp to 0..1
+    /// </summary>
+    /// <param name="v"></param>
+    /// <returns></returns>
+    private static double Clamp01(double v) => v < 0 ? 0 : v > 1 ? 1 : v;
+    
+    //some better way to interpolate points.
     public static (double, double) Map2Point(
         in Point data,               
         int height, int width,  
@@ -41,13 +35,14 @@ public static class RangesMapper
     {
         if (width <= 0 || height <= 0) return new (0, 0);
 
+        // some protectiopn
         if (dbMax <= dbMin)
             dbMax = dbMin + 1e-9;
         
         if (fMax <= fMin)
             fMax  = fMin + 1e-9;
 
-        double fx = data.X;
+        var fx = data.X;
         double nx; 
 
         if (!xLog)
@@ -56,18 +51,19 @@ public static class RangesMapper
         }
         else
         {
-            double lfMin = Math.Log(Math.Max(fMin, 1e-12));
-            double lfMax = Math.Log(Math.Max(fMax, 1e-12));
-            double lfx   = Math.Log(Math.Max(fx,   1e-12));
+            // not used right now but would be cool to have.
+            var lfMin = Math.Log(Math.Max(fMin, 1e-12));
+            var lfMax = Math.Log(Math.Max(fMax, 1e-12));
+            var lfx   = Math.Log(Math.Max(fx,   1e-12));
             nx = (lfx - lfMin) / (lfMax - lfMin);
         }
         nx = Clamp01(nx);
-        double px = nx * (width - 1);
+        var px = nx * (width - 1);
 
-        double db = data.Y;
-        double ny = (dbMax - db) / (dbMax - dbMin);
+        var db = data.Y;
+        var ny = (dbMax - db) / (dbMax - dbMin);
         ny = Clamp01(ny);
-        double py = ny * (height - 1);
+        var py = ny * (height - 1);
 
         return new (px, py);
     }

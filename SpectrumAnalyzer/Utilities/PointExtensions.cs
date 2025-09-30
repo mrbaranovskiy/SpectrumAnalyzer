@@ -33,5 +33,5 @@ public struct AxisRange
     /// Returns power in watts.
     /// </summary>
     /// <param name="magnitudeInDb"></param>
-    public static double FromDecibels(double magnitudeInDb) => Math.Pow(10, magnitudeInDb / 10);
+    public static double FromDecibels(double magnitudeInDb) => Math.Pow(10, magnitudeInDb / 20);
 }

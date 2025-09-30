@@ -63,6 +63,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _representations = [];
         //set some defaults
       
+        // here is a lot of hardcoded stuff, close to requirements from the task
+        // obviously - this is trash code.  
+        
         _fftProperties = new FFTDrawingProperties(
             ITransport<Complex>.DefaultChunkSize,
             100,

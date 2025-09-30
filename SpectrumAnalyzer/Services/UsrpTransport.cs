@@ -129,7 +129,7 @@ public class UsrpTransport : ITransport<Complex>
                 // var temp = new double[_bufferFloat.Length];
                 // FftSharp.SampleData.AddSin(temp, (int) _connectionProps.SampleRateHz, accumulator+=2000, 0.03);
 
-                for (int i = 0; i < bytesRead; i+=2)
+                for (var i = 0; i < bytesRead; i+=2)
                 {
                     _bufferComplex[i / 2] = new Complex(_bufferFloat[i],_bufferFloat[i + 1]);
                 }
