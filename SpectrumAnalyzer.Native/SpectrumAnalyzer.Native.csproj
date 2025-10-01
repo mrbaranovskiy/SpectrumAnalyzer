@@ -16,4 +16,12 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="CudaMathUtils\cuda_math.cu" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="CudaMathUtils\cuda_math_api.cu" />
+    </ItemGroup>
+
 </Project>
