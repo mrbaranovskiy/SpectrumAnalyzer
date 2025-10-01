@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Reflection.PortableExecutable;
 using Moq;
 using SpectrumAnalyzer.Renderer;
 using SpectrumAnalyzer.Services;

@@ -1,5 +1,4 @@
-﻿using Avalonia.Media;
-using SpectrumAnalyzer.Utilities;
+﻿using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Renderer;
 

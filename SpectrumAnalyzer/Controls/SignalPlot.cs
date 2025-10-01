@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Drawing;
-using System.Linq;
 using System.Numerics;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using SpectrumAnalyzer.Renderer;
-using SpectrumAnalyzer.Services;
-using SpectrumAnalyzer.Utilities;
 using Brushes = Avalonia.Media.Brushes;
-using Color = Avalonia.Media.Color;
-using Point = Avalonia.Point;
-using Size = Avalonia.Size;
 using Vector = Avalonia.Vector;
 
 namespace SpectrumAnalyzer.Controls;

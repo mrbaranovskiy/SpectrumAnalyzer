@@ -1,9 +1,4 @@
-﻿using System.Numerics;
-using Moq;
-using SpectrumAnalyzer.Services;
-using SpectrumAnalyzer.Services.Native;
-
-namespace SpectrumAnalyzer.Tests.Services;
+﻿namespace SpectrumAnalyzer.Tests.Services;
 
 [TestClass]
 public class TransportTests

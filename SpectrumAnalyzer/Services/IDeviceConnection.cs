@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace SpectrumAnalyzer.Services;
+﻿namespace SpectrumAnalyzer.Services;
 
 public interface IDeviceConnection<TData, in TConnectionProps>
     where TConnectionProps : IConnectionProperties

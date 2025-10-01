@@ -1,8 +1,6 @@
 ﻿using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
-using SpectrumAnalyzer.Renderer;
 using SpectrumAnalyzer.Services;
-using SpectrumAnalyzer.Services.Native;
 using SpectrumAnalyzer.ViewModels;
 
 public static class ServiceCollectionExtensions

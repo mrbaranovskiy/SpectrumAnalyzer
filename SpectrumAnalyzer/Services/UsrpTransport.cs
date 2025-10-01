@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Buffers;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using SpectrumAnalyzer.Services.Native;
-using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Services;
 

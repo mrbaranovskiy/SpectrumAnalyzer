@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Numerics;
 using Avalonia;
-using Avalonia.Media;
 
 namespace SpectrumAnalyzer.Utilities;
 
