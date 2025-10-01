@@ -5,7 +5,6 @@ using Avalonia;
 using SpectrumAnalyzer.Utilities;
 using Avalonia.Media;
 
-
 namespace SpectrumAnalyzer.Renderer;
 
 public class FftRepresentation<TDrawingProperties> 

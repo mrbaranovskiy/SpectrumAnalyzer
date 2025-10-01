@@ -24,11 +24,6 @@ public sealed class BitmapGraphics
         return new BitmapGraphics(width, height, factor);
     }
 
-    private  void ApplyKernel(Span<byte> image)
-    {
-        
-    }
-    
     private static int Round(float n)
     {
         if (n - (int)n < 0.5)

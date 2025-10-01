@@ -80,7 +80,7 @@ public sealed class StreamingIQPool : IStreamingDataPool<Complex>
         while (!_queue.IsEmpty)
         {
             _queue.TryDequeue(out var data);
-            _pool.Return(data, true);
+            if (data != null) _pool.Return(data, true);
         }
     }
 

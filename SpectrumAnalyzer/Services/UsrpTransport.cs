@@ -107,25 +107,6 @@ public class UsrpTransport : ITransport<Complex>
                 _memoryFloat.Span.Clear();
                 
                 _api.Receive(_bufferFloat, ReceivingChunkSize, out var bytesRead);
-                
-                //Thread.Sleep(1000);
-
-                if (bytesRead > 0)
-                {
-                    if (_bufferFloat.All(s=> s==0))
-                    {
-                        Console.WriteLine("Something went wrong");
-                    }
-
-                    if (bytesRead < this.ReceivingChunkSize)
-                    {
-                        Console.WriteLine($"Small chunk received {bytesRead}");
-                    }
-                }
-                    
-                //var bytesRead = _bufferFloat.Length;
-                // var temp = new double[_bufferFloat.Length];
-                // FftSharp.SampleData.AddSin(temp, (int) _connectionProps.SampleRateHz, accumulator+=2000, 0.03);
 
                 for (var i = 0; i < bytesRead; i+=2)
                 {
