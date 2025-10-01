@@ -43,11 +43,6 @@ public class FftRepresentation<TDrawingProperties>
         var wndSize = DrawingProperties.Height * DrawingProperties.Width * 4;
         var screenPoints = ArrayPool<Point>.Shared.Rent(wndSize);
      
-        
-        //todo: need to decide how many points to draw on the screen. 
-        //there is no much sense to draw them all.
-        // temporary I took 3 screen width. 
-        // Mayne some Shannon theorem to avoid signal lost.
         var screenPointsMem = new Memory<Point>(screenPoints, 0, NumberOfPointsToDraw);
 
         var resampledPower = ArrayPool<double>.Shared.Rent(NumberOfPointsToDraw);
