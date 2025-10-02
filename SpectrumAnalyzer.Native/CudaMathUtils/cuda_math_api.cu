@@ -53,12 +53,12 @@ int iq_fft_c2c_forward(const float* in_host, float* out_host, int n){
     if (int e=checkCuda(cudaMemcpy(out_host, d_out, bytes, cudaMemcpyDeviceToHost), "D2H")) return e;
     cufftDestroy(plan);
     cudaFree(d_in); cudaFree(d_out);
-    return 0;
+    return 0;   
 }
 
 int iq_fft_c2c_forward2(const float* in_host, float* out_host, int n) {
     if (!in_host || !out_host || n <= 0) return 3;
-
+    
     // Interleaved complex: cufftComplex == float2
     size_t bytes = sizeof(float) * 2 * n;
     cufftComplex* d_in  = nullptr;
@@ -72,12 +72,12 @@ int iq_fft_c2c_forward2(const float* in_host, float* out_host, int n) {
     if (int e = checkCufft(cufftPlan1d(&plan, n, CUFFT_C2C, 1), "cufftPlan1d C2C")) return e;
 
     if (int e = checkCufft(cufftExecC2C(plan, d_in, d_out, CUFFT_FORWARD), "cufftExecC2C FWD")) return e;
+
     if (int e = checkCuda(cudaDeviceSynchronize(), "cudaDeviceSynchronize")) return e;
-
     if (int e = checkCuda(cudaMemcpy(out_host, d_out, bytes, cudaMemcpyDeviceToHost), "D2H out")) return e;
-
     cufftDestroy(plan);
-    cudaFree(d_in); cudaFree(d_out);
+    cudaFree(d_in);
+    cudaFree(d_out);
     return 0;
 }
 
