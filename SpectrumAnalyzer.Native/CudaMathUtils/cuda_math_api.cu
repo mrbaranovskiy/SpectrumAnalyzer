@@ -12,6 +12,7 @@ __global__ void k_fftshift_interleaved(float* x, int n);
 __global__ void k_power(const float* __restrict__ x, float* __restrict__ p, int n);
 __global__ void k_power_db(const float* __restrict__ x, float* __restrict__ p_db, int n, float floor_db);
 __global__ void k_fftshift_interleaved(float* x, int n);
+__global__ void k_scale(float* __restrict__ freqs, int N, float Fs);
 
 static inline int checkCuda(cudaError_t st, const char* where){
     if (st != cudaSuccess){ std::fprintf(stderr,"[CUDA]%s: %s\n",where,cudaGetErrorString(st)); return 1; }
@@ -62,16 +63,20 @@ int iq_fft_c2c_forward2(const float* in_host, float* out_host, int n) {
     // Interleaved complex: cufftComplex == float2
     size_t bytes = sizeof(float) * 2 * n;
     cufftComplex* d_in  = nullptr;
-    cufftComplex* d_out = nullptr;
-
+    cufftReal* d_out = nullptr;
+   
     if (int e = checkCuda(cudaMalloc(&d_in,  bytes), "cudaMalloc d_in")) return e;
-    if (int e = checkCuda(cudaMalloc(&d_out, bytes), "cudaMalloc d_out")) return e;
+    
+    if (int e = checkCuda(cudaMalloc(&d_out, bytes / 2 + 1 ), "cudaMalloc d_out")) return e;
+    
     if (int e = checkCuda(cudaMemcpy(d_in, in_host, bytes, cudaMemcpyHostToDevice), "H2D in")) return e;
-
+    return n;
+  
+   
     cufftHandle plan;
-    if (int e = checkCufft(cufftPlan1d(&plan, n, CUFFT_C2C, 1), "cufftPlan1d C2C")) return e;
-
-    if (int e = checkCufft(cufftExecC2C(plan, d_in, d_out, CUFFT_FORWARD), "cufftExecC2C FWD")) return e;
+    if (int e = checkCufft(cufftPlan1d(&plan, n, CUFFT_C2R, 1), "cufftPlan1d C2C")) return e;
+    
+    if (int e = checkCufft(cufftExecC2R(plan, d_in, d_out), "cufftExecC2C FWD")) return e;
 
     if (int e = checkCuda(cudaDeviceSynchronize(), "cudaDeviceSynchronize")) return e;
     if (int e = checkCuda(cudaMemcpy(out_host, d_out, bytes, cudaMemcpyDeviceToHost), "D2H out")) return e;
@@ -85,9 +90,11 @@ int iq_power_spectrum(const float* in_host, float* out_host, int n){
     if (!in_host || !out_host || n<=0) return 3;
     size_t bytes = sizeof(float)*2*n;
     float *d_in=nullptr; float *d_pow=nullptr;
+    
     if (int e=checkCuda(cudaMalloc(&d_in, bytes), "malloc d_in")) return e;
     if (int e=checkCuda(cudaMalloc(&d_pow, sizeof(float)*n), "malloc d_pow")) return e;
     if (int e=checkCuda(cudaMemcpy(d_in, in_host, bytes, cudaMemcpyHostToDevice), "H2D")) return e;
+
 
     dim3 blk(256), grd((n+255)/256);
     k_power<<<grd,blk>>>(d_in, d_pow, n);
@@ -96,6 +103,21 @@ int iq_power_spectrum(const float* in_host, float* out_host, int n){
     if (int e=checkCuda(cudaMemcpy(out_host, d_pow, sizeof(float)*n, cudaMemcpyDeviceToHost), "D2H")) return e;
     cudaFree(d_in); cudaFree(d_pow);
     return 0;
+}
+
+int k_scale_r(float* out_host, float N, float Fs)
+{
+    float* d_freqs;
+    cudaMalloc(&d_freqs, N * sizeof(float));
+
+    dim3 block(256);
+    dim3 grid((N + block.x - 1) / block.x);
+
+    k_scale<<<grid, block>>>(d_freqs, N, Fs);
+
+    if (int e=checkCuda(cudaDeviceSynchronize(), "sync")) return e;
+    if (int e=checkCuda(cudaMemcpy(out_host, d_freqs, sizeof(float)*N, cudaMemcpyDeviceToHost), "D2H")) return e;
+    cudaFree(d_freqs);
 }
 
 int iq_power_db(const float* in_host, float* out_host, int n, float floor_db){

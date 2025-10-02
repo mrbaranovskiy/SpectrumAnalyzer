@@ -40,6 +40,15 @@ __global__ void k_power_db(const float* __restrict__ x, float* __restrict__ p_db
     p_db[i] = fmaxf(db, floor_db);
 }
 
+__global__ void k_scale(float* __restrict__ freqs, int N, float Fs)
+{
+    int k = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (k < N) {
+        freqs[k] = k * (Fs / N);
+    }
+}
+
 // in-place fftshift for interleaved complex buffer
 __global__ void k_fftshift_interleaved(float* x, int n){
     int i = blockIdx.x * blockDim.x + threadIdx.x; // complex index

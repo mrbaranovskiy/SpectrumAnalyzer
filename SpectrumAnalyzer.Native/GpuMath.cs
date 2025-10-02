@@ -24,4 +24,7 @@ public static class GpuMath
 
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
     public static extern int iq_fftshift_inplace(IntPtr ioHost, int n);
+    
+    [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int k_scale_r(IntPtr inHost, float n, float fs);
 }

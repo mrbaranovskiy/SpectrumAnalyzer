@@ -28,6 +28,8 @@ extern "C" {
     int iq_power_spectrum(const float* in_host, float* out_host, int n);
     // center DC (fftshift) for interleaved complex buffer in place
     int iq_fftshift_inplace(float* io_host, int n);
-    // optional: power-in-dB with clamp to avoid log(0)
+    // power-in-dB with clamp to avoid log(0)
     int iq_power_db(const float* in_host, float* out_host, int n, float floor_db);
+    // scale to frequncy (this is real)
+    int k_scale_r(float* out_host, float N, float Fs);
 }
