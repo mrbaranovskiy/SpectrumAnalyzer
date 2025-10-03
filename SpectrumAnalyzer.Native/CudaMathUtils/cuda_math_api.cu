@@ -79,7 +79,7 @@ int iq_fft_c2c_forward(const float* in_host, float* out_host, int n)
     return 0;
 }
 
-int iq_fft_c2r_forward2(const float* in_host, float* out_host, int n)
+int iq_fft_c2r_forward(const float* in_host, float* out_host, int n)
 {
     if (!in_host || !out_host || n <= 0) return 3;
 
