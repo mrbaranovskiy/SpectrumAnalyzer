@@ -30,6 +30,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AInteractive_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FSourcesCache_003F11af8f98c443d1a15dafaafbe21ee24e91ec83bccda0db8db8d85f9782f92ead_003FInteractive_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AInteractive_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FSourcesCache_003F11af8f98c443d1a15dafaafbe21ee24e91ec83bccda0db8db8d85f9782f92ead_003FInteractive_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AInvalidOperationException_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FSourcesCache_003F564d11e3c8cbbd636fa9aa3a7b73d9ef576176dfee78aff1abcc84c359c266a_003FInvalidOperationException_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AIValueTaskSource_00601_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F6be377f045094751a6e1b5a91d0f90f7b2e200_003F02_003Fd60f3865_003FIValueTaskSource_00601_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ALibraryImportAttribute_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F6be377f045094751a6e1b5a91d0f90f7b2e200_003F82_003F2ec8a36d_003FLibraryImportAttribute_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ALinearGradientBrush_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FSourcesCache_003F468430143ef19b89434c632ea05f2e704ac8d7e27661577226f9d4d976a0eb_003FLinearGradientBrush_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AList_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fb7208b3f72528d22781d25fde9a55271bdf2b5aade4f03b1324579a25493cd8_003FList_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
@@ -66,6 +67,31 @@
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.UhdTest.ConnectToDeviceTest&lt;/TestId&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.Services.StreamingPoolTests.TestStreamingDataPool&lt;/TestId&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.UtilitiesTests&lt;/TestId&gt;
+    &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.GPUTests.CudaApiTests.TestFFt&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2d656e33_002D5bfe_002D4480_002D9556_002D25c3b722b063/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestFFt #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.GPUTests.CudaApiTests.TestFFt&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4a998f52_002Dbdbc_002D4f4b_002Db213_002D83ceaf5839ee/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestFFt #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.GPUTests.CudaApiTests.TestFFt&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7e058bf8_002D8a60_002D48a4_002D8e4b_002Dd0832f2055e9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestFFt #4" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.GPUTests.CudaApiTests.TestFFt&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b4318994_002D8614_002D474a_002Da5cd_002D16936936b3b6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestFFt #6" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.GPUTests.CudaApiTests.TestFFt&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b9d376a0_002D1f89_002D4560_002D9eb7_002D3909852d12ab/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestFFt #5" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
     &lt;TestId&gt;MSTest::C4D8D15A-C466-4B38-8BB2-664AC756CF38::net8.0::SpectrumAnalyzer.Tests.GPUTests.CudaApiTests.TestFFt&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>

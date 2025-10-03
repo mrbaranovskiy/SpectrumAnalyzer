@@ -14,13 +14,16 @@ public static class GpuMath
     public static extern int iq_fft_c2c_forward(IntPtr inHost, IntPtr outHost, int n);
     
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int iq_fft_c2c_forward2(IntPtr inHost, IntPtr outHost, int n);
+    public static extern int iq_fft_c2r_forward2(IntPtr inHost, IntPtr outHost, int n);
 
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
     public static extern int iq_power_spectrum(IntPtr inHost, IntPtr outHost, int n);
 
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
     public static extern int iq_power_db(IntPtr inHost, IntPtr outHost, int n, float floorDb);
+    
+    [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int iq_power_db_real(IntPtr inHost, IntPtr outHost, int n, float floorDb);
 
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
     public static extern int iq_fftshift_inplace(IntPtr ioHost, int n);

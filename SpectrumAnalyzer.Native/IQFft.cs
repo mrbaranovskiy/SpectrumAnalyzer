@@ -12,7 +12,7 @@ public static class IqFft
         var ho = GCHandle.Alloc(outInterleaved, GCHandleType.Pinned);
         try
         {
-            int rc = GpuMath.iq_fft_c2c_forward2(hi.AddrOfPinnedObject(), ho.AddrOfPinnedObject(), n);
+            int rc = GpuMath.iq_fft_c2r_forward2(hi.AddrOfPinnedObject(), ho.AddrOfPinnedObject(), n);
             if (rc != 0) throw new InvalidOperationException($"FFT failed: {rc}");
         }
         finally

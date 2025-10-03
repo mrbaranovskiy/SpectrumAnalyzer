@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks.Sources;
 using SpectrumAnalyzer.Native;
 
 namespace SpectrumAnalyzer.Tests.GPUTests;
@@ -34,42 +35,39 @@ public class CudaApiTests
     [TestMethod]
     public void TestFFt()
     {
-        var len = 1 << 20;
+        var len = 1 << 10;
         var data = new float[len];
         var temp = new double[data.Length];
 
-        FftSharp.SampleData.AddSin(temp, 32000, 1000, 0.001);
+        FftSharp.SampleData.AddSin(temp, 32000, 500, 1);
         
-        // var start = Stopwatch.StartNew();
-        // FftSharp.FFT.Forward(temp);
-        // start.Stop();
+        for (int i = 1; i < len; i+=1)
+            data[i] = (float)temp[i];
         
-        for (int i = 0; i < len; i+=2) data[i] = (float)temp[i];
+        using var signal_raw_c = new UnmanagedFloatBuffer(data.Length);
         
-        using var signal_buffer = new UnmanagedFloatBuffer(data.Count());
+        var test = new float[len];
+        signal_raw_c.CopyFrom(data);
+        signal_raw_c.CopyTo(test);
         
         
-        using var output = new UnmanagedFloatBuffer(data.Count());
-        using var power = new UnmanagedFloatBuffer(data.Count());
-        using var freqs = new UnmanagedFloatBuffer(power.Length);
+        var spectrum_raw = new UnmanagedFloatBuffer(signal_raw_c.Length / 2);
+        var power_raw = new UnmanagedFloatBuffer(signal_raw_c.Length / 2);
+        var freqs_raw = new UnmanagedFloatBuffer(signal_raw_c.Length / 2);
         
-        var results =  new float[data.Length ];
-        var freqsResults =  new float[power.Length ];
-        signal_buffer.CopyFrom(data);
+        GpuMath.iq_fft_c2r_forward2(signal_raw_c.Ptr, spectrum_raw.Ptr, data.Length / 2);
+        GpuMath.iq_power_db_real(spectrum_raw.Ptr, power_raw.Ptr, spectrum_raw.Length, -160);
+        GpuMath.k_scale_r(freqs_raw.Ptr, power_raw.Length, 32000);
         
-        var err = GpuMath.iq_fft_c2c_forward2(signal_buffer.Ptr, output.Ptr, data.Length);
+        var spec_out =  new float[spectrum_raw.Length];
+        var power_out =  new float[spectrum_raw.Length];
+        var freqs_out =  new float[power_raw.Length ];
 
-        //var test = FftSharp.FFT.Forward(signal);
-        GpuMath.iq_power_db(output.Ptr, power.Ptr, power.Length, -160);
-        power.CopyTo(results);
-
-        GpuMath.k_scale_r(freqs.Ptr, freqsResults.Length, 32000);
-        freqs.CopyTo(freqsResults);
+        spectrum_raw.CopyTo(spec_out);
+        power_raw.CopyTo(power_out);
+        freqs_raw.CopyTo(freqs_out);
         
-        
-        power.CopyTo(results);
-        
-        Assert.IsFalse(results.All(s=>s==0.0));
+        Assert.IsFalse(power_out.All(s=>s==0.0));
     }
 }
 

@@ -40,6 +40,25 @@ __global__ void k_power_db(const float* __restrict__ x, float* __restrict__ p_db
     p_db[i] = fmaxf(db, floor_db);
 }
 
+__global__ void k_power_db_real(const float* __restrict__ x,
+                                float* __restrict__ p_db,
+                                int n,
+                                float floor_db)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= n) return;
+
+    float v = x[i];
+    float pw = v * v;
+
+    float db = 10.0f * log10f(fmaxf(pw, 1e-30f));
+
+    printf("idx %d %f : %f \n ", i, db, v);
+
+    // clamp to floor
+    p_db[i] = fmaxf(db, floor_db);
+}
+
 __global__ void k_scale(float* __restrict__ freqs, int N, float Fs)
 {
     int k = blockIdx.x * blockDim.x + threadIdx.x;
