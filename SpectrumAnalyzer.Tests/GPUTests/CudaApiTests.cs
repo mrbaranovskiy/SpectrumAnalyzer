@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks.Sources;
+using DynamicData;
 using SpectrumAnalyzer.Native;
 
 namespace SpectrumAnalyzer.Tests.GPUTests;
@@ -35,29 +36,35 @@ public class CudaApiTests
     [TestMethod]
     public void TestFFt()
     {
-        var len = 1 << 10;
-        var data = new float[len];
-        var temp = new double[data.Length];
-
-        FftSharp.SampleData.AddSin(temp, 32000, 500, 1);
+        var len = 1 << 24;
+        var iqSignal = new float[len];
+        float dt = 1.0f/32000.0f;
+        float freq = (float)1e3;
+        float tick = dt;
         
-        for (int i = 1; i < len; i+=1)
-            data[i] = (float)temp[i];
+        for (int i = 0; i < len; i+=2)
+        {
+            iqSignal[i] = (float)Math.Sin(2 * Math.PI * freq * tick ) * 0.01f;
+            tick += dt;
+        }
         
-        using var signal_raw_c = new UnmanagedFloatBuffer(data.Length);
+        using var signal_raw_c = new UnmanagedFloatBuffer(iqSignal.Length);
         
         var test = new float[len];
-        signal_raw_c.CopyFrom(data);
+        signal_raw_c.CopyFrom(iqSignal);
         signal_raw_c.CopyTo(test);
-        
         
         var spectrum_raw = new UnmanagedFloatBuffer(signal_raw_c.Length / 2);
         var power_raw = new UnmanagedFloatBuffer(signal_raw_c.Length / 2);
         var freqs_raw = new UnmanagedFloatBuffer(signal_raw_c.Length / 2);
-        
-        GpuMath.iq_fft_c2r_forward2(signal_raw_c.Ptr, spectrum_raw.Ptr, data.Length / 2);
-        GpuMath.iq_power_db_real(spectrum_raw.Ptr, power_raw.Ptr, spectrum_raw.Length, -160);
+
+        var sw = Stopwatch.StartNew();
+        GpuMath.iq_fft_c2c_forward(signal_raw_c.Ptr, spectrum_raw.Ptr, iqSignal.Length / 2);
+        GpuMath.iq_power_db(spectrum_raw.Ptr, power_raw.Ptr, spectrum_raw.Length, -160);
         GpuMath.k_scale_r(freqs_raw.Ptr, power_raw.Length, 32000);
+        sw.Stop();
+        
+        Debug.WriteLine(sw.Elapsed);
         
         var spec_out =  new float[spectrum_raw.Length];
         var power_out =  new float[spectrum_raw.Length];
@@ -66,7 +73,10 @@ public class CudaApiTests
         spectrum_raw.CopyTo(spec_out);
         power_raw.CopyTo(power_out);
         freqs_raw.CopyTo(freqs_out);
-        
+
+        var indexOf = power_out.IndexOf(power_out.Max());
+        var frequence = freqs_out[indexOf];
+
         Assert.IsFalse(power_out.All(s=>s==0.0));
     }
 }
