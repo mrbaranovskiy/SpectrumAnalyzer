@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using ReactiveUI;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Renderer;
 using SpectrumAnalyzer.Services;
 using SpectrumAnalyzer.Utilities;
@@ -13,12 +14,12 @@ namespace SpectrumAnalyzer.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    private readonly IDeviceConnection<Complex, UsrpConnectionProperties> _usrpConnection;
+    private readonly IDeviceConnection<ComplexF, UsrpConnectionProperties> _usrpConnection;
     private int _samplingRate;
     private int _bandwidth;
     private int _centerFrequency;
-    private IStreamingDataPool<Complex> _streamingPool;
-    private ITransport<Complex> _transport;
+    private IStreamingDataPool<ComplexF> _streamingPool;
+    private ITransport<ComplexF> _transport;
     private ComplexDataRenderer _renderer;
     
     private double _minFrequencyAxis;
@@ -42,7 +43,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private List<IRendererRepresentation<Complex>> _representations;
+    private List<IRendererRepresentation<ComplexF>> _representations;
     
     private FftRepresentation<FFTDrawingProperties> _fftRepresentation;
     private WaterfallRepresentation _waterfallRepresentation;
@@ -57,7 +58,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private double _waterfallCtrlHeight;
     private int _selectedRadio;
 
-    public MainWindowViewModel(IDeviceConnection<Complex, UsrpConnectionProperties> usrpConnection)
+    public MainWindowViewModel(IDeviceConnection<ComplexF, UsrpConnectionProperties> usrpConnection)
     {
         _usrpConnection = usrpConnection;
         _representations = [];
@@ -67,7 +68,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         // obviously - this is trash code.  
         
         _fftProperties = new FFTDrawingProperties(
-            ITransport<Complex>.DefaultChunkSize,
+            ITransport<ComplexF>.DefaultChunkSize,
             100,
             100,
             Bandwidth,
@@ -77,7 +78,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             new AxisRange(CenterFrequency,
                 CenterFrequency + SamplingRate / 2));
 
-        _waterfallDrawingProperties = new WaterfallDrawingProperties(ITransport<Complex>.DefaultChunkSize,
+        _waterfallDrawingProperties = new WaterfallDrawingProperties(ITransport<ComplexF>.DefaultChunkSize,
             100, 100,
             Bandwidth,
             CenterFrequency, SamplingRate,
@@ -122,18 +123,18 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             Antenna = "RX2",
             BandwidthHz = Bandwidth,
             CenterFrequencyHz = CenterFrequency,
-            GainDb = 50,
+            GainDb = 30,
             SampleRateHz = SamplingRate
         };
 
         if (SelectedRadio == 0)
         {
-            _transport = new FakeTransport(connectionProps, ITransport<Complex>.DefaultChunkSize);
+            _transport = new FakeTransport(connectionProps, ITransport<ComplexF>.DefaultChunkSize);
         }
         else
         {
             _transport = _usrpConnection.BuildConnection(connectionProps);
-            _transport.ReceivingChunkSize = ITransport<Complex>.DefaultChunkSize;
+            _transport.ReceivingChunkSize = ITransport<ComplexF>.DefaultChunkSize;
         }
             
         _streamingPool = new StreamingIQPool(_transport);

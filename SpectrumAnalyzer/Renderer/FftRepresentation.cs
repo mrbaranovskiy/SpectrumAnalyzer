@@ -4,11 +4,13 @@ using System.Numerics;
 using Avalonia;
 using SpectrumAnalyzer.Utilities;
 using Avalonia.Media;
+using SpectrumAnalyzer.Models;
+using SpectrumAnalyzer.Native;
 
 namespace SpectrumAnalyzer.Renderer;
 
 public class FftRepresentation<TDrawingProperties> 
-    : RendererRepresentationAbstract<TDrawingProperties, Complex> 
+    : RendererRepresentationAbstract<TDrawingProperties, ComplexF> 
     where TDrawingProperties : IDrawingProperties
 {
     public FftRepresentation(TDrawingProperties properties) 
@@ -20,10 +22,10 @@ public class FftRepresentation<TDrawingProperties>
     public override void Dispose()
     {
         BitmapPool.Return(BitmapBuffer);
-        ArrayPool<Complex>.Shared.Return(SignalBuffer);
+        ArrayPool<ComplexF>.Shared.Return(SignalBuffer);
     }
 
-    public override void BuildRepresentation(ReadOnlySpan<Complex> data)
+    public override void BuildRepresentation(ReadOnlySpan<ComplexF> data)
     {
         if(Rendered)
             return;
@@ -33,23 +35,25 @@ public class FftRepresentation<TDrawingProperties>
         
         //todo: probably this is redundant copy
         data.CopyTo(SignalMemoryHandle.Span);
-
-        FftSharp.FFT.Forward(SignalMemoryHandle.Span);
+        
+        // FftSharp.FFT.Forward(SignalMemoryHandle.Span);
+        AcceleratedMath.FftForward(SignalMemoryHandle, SignalMemoryHandle);
+        AcceleratedMath.FftPower(SignalMemoryHandle, PowerMemoryHandle);
         // todo: GC intensive code. Need to Implement FFT over Spans.
-        var power = FftSharp.FFT.Power(SignalBuffer);
-        var freq = FftSharp.FFT.FrequencyScale(power.Length, DrawingProperties.SamplingRate);
+        var freq = FftSharp.FFT.FrequencyScale(PowerMemoryHandle.Length, DrawingProperties.SamplingRate);
 
         var wndSize = DrawingProperties.Height * DrawingProperties.Width * 4;
         var screenPoints = ArrayPool<Point>.Shared.Rent(wndSize);
      
         var screenPointsMem = new Memory<Point>(screenPoints, 0, NumberOfPointsToDraw);
 
-        var resampledPower = ArrayPool<double>.Shared.Rent(NumberOfPointsToDraw);
-        var resPowerMem = new Memory<double>(resampledPower, 0, NumberOfPointsToDraw);
-        SignalDecimation.ResampleData(power, resPowerMem.Span);
+        var resampledPower = ArrayPool<ComplexF>.Shared.Rent(NumberOfPointsToDraw);
+        var resPowerMem = new Memory<ComplexF>(resampledPower, 0, NumberOfPointsToDraw);
+        // todo: i alread forgot that power is also complex
+        SignalDecimation.ResampleData(PowerMemoryHandle.Span, resPowerMem.Span);
         
-        var resampledFreq = ArrayPool<double>.Shared.Rent(NumberOfPointsToDraw);
-        var resFreqMem = new Memory<double>(resampledFreq, 0, NumberOfPointsToDraw);
+        var resampledFreq = ArrayPool<float>.Shared.Rent(NumberOfPointsToDraw);
+        var resFreqMem = new Memory<float>(resampledFreq, 0, NumberOfPointsToDraw);
         SignalDecimation.ResampleData(freq, resFreqMem.Span);
         
         var ys = resPowerMem.Span;
@@ -60,8 +64,8 @@ public class FftRepresentation<TDrawingProperties>
         
         
         ArrayPool<Point>.Shared.Return(screenPoints, true); 
-        ArrayPool<double>.Shared.Return(resampledPower, true);
-        ArrayPool<double>.Shared.Return(resampledFreq, true);
+        ArrayPool<ComplexF>.Shared.Return(resampledPower, true);
+        ArrayPool<float>.Shared.Return(resampledFreq, true);
     }
 
     protected override void Draw(Memory<Point> generatePoints, Span<double> ys, Span<double> xs)

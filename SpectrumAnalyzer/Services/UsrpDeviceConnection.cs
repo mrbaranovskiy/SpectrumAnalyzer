@@ -1,11 +1,12 @@
 ﻿using System.Numerics;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Services.Native;
 
 namespace SpectrumAnalyzer.Services;
 
-public class UsrpDeviceConnection : IDeviceConnection<Complex, UsrpConnectionProperties>
+public class UsrpDeviceConnection : IDeviceConnection<ComplexF, UsrpConnectionProperties>
 {
-    public ITransport<Complex> BuildConnection(UsrpConnectionProperties connectionProps)
+    public ITransport<ComplexF> BuildConnection(UsrpConnectionProperties connectionProps)
     {
         return new UsrpTransport(new UsrpApi(), connectionProps);
     }

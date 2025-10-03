@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace SpectrumAnalyzer.Native;
-
+//todo: need to do some stuff to check if it is supported.
 public static class GpuMath
 {
     private const string Lib = "libcuda_lib.so";

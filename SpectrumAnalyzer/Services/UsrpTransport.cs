@@ -3,20 +3,21 @@ using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Services.Native;
 
 namespace SpectrumAnalyzer.Services;
 
-public class UsrpTransport : ITransport<Complex>
+public class UsrpTransport : ITransport<ComplexF>
 {
     private readonly IDeviceNativeApi<float> _api;
     private readonly UsrpConnectionProperties _connectionProps;
     private Task _readTask;
     private readonly CancellationTokenSource _cts = new();
-    private Memory<Complex> _memoryComplex;
+    private Memory<ComplexF> _memoryComplex;
     public event EventHandler<DataReceivedEventArgs>? DataReceived;
     private static readonly object Lock = new();
-    private Complex[] _bufferComplex;
+    private ComplexF[] _bufferComplex;
     private float[] _bufferFloat;
     private int _receivingChunkSize = 1 << 12;
     private readonly Memory<float> _memoryFloat;
@@ -28,8 +29,8 @@ public class UsrpTransport : ITransport<Complex>
         _readTask = Task.CompletedTask;
         _api = api;
         _connectionProps = connectionProps;
-        _bufferComplex = new Complex[ReceivingChunkSize];
-        _memoryComplex = new Memory<Complex>(_bufferComplex);
+        _bufferComplex = new ComplexF[ReceivingChunkSize];
+        _memoryComplex = new Memory<ComplexF>(_bufferComplex);
         _bufferFloat = new float[2*ReceivingChunkSize];
         _memoryFloat = new Memory<float>(_bufferFloat);
     }
@@ -38,7 +39,7 @@ public class UsrpTransport : ITransport<Complex>
 
     public DateTime LastDataReceived { get; private set; }
 
-    public ReadOnlySpan<Complex> GetRawData()
+    public ReadOnlySpan<ComplexF> GetRawData()
     {
         lock (Lock)
             return _memoryComplex.Span;
@@ -87,9 +88,9 @@ public class UsrpTransport : ITransport<Complex>
     {
         lock (Lock)
         {
-            _bufferComplex = new Complex[_receivingChunkSize];
+            _bufferComplex = new ComplexF[_receivingChunkSize];
             _bufferFloat = new float[2 * _receivingChunkSize];
-            _memoryComplex = new Memory<Complex>(_bufferComplex);
+            _memoryComplex = new Memory<ComplexF>(_bufferComplex);
         }
     }
     
@@ -110,7 +111,7 @@ public class UsrpTransport : ITransport<Complex>
 
                 for (var i = 0; i < bytesRead; i+=2)
                 {
-                    _bufferComplex[i / 2] = new Complex(_bufferFloat[i],_bufferFloat[i + 1]);
+                    _bufferComplex[i / 2] = new ComplexF(_bufferFloat[i],_bufferFloat[i + 1]);
                 }
                 
                 LastDataReceived = DateTime.UtcNow;

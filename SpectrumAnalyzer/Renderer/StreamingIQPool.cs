@@ -2,23 +2,24 @@
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Numerics;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Services;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public sealed class StreamingIQPool : IStreamingDataPool<Complex>
+public sealed class StreamingIQPool : IStreamingDataPool<ComplexF>
 {
-    private readonly ITransport<Complex> _transport;
-    private readonly ArrayPool<Complex> _pool;
+    private readonly ITransport<ComplexF> _transport;
+    private readonly ArrayPool<ComplexF> _pool;
     private ulong _chunkId = 0; //forever  and ever.
-    private readonly ConcurrentQueue<Complex[]> _queue;
+    private readonly ConcurrentQueue<ComplexF[]> _queue;
 
-    public StreamingIQPool(ITransport<Complex> transport)
+    public StreamingIQPool(ITransport<ComplexF> transport)
     {
-        _pool = ArrayPool<Complex>.Create(1024*1024*10, 1024*10);
+        _pool = ArrayPool<ComplexF>.Create(1024*1024*10, 1024*10);
         _transport = transport;
         _transport.DataReceived += TransportOnDataReceived;
-        _queue = new ConcurrentQueue<Complex[]>();
+        _queue = new ConcurrentQueue<ComplexF[]>();
         MaxQueueSize = 10;
     }
 
@@ -44,7 +45,7 @@ public sealed class StreamingIQPool : IStreamingDataPool<Complex>
 
     public int MaxQueueSize { get; set; }
 
-    public bool RequestLatestCopy(Span<Complex> buffer)
+    public bool RequestLatestCopy(Span<ComplexF> buffer)
     {
         if (!_queue.TryDequeue(out var data))
             return false;
@@ -62,10 +63,10 @@ public sealed class StreamingIQPool : IStreamingDataPool<Complex>
     /// Peeks but doesnt delete the data from queue.
     /// </summary>
     /// <returns>Returns empty if no data.</returns>
-    public ReadOnlySpan<Complex> PeekLatestData()
+    public ReadOnlySpan<ComplexF> PeekLatestData()
     {
         return !_queue.TryPeek(out var data) 
-            ? ReadOnlySpan<Complex>.Empty 
+            ? ReadOnlySpan<ComplexF>.Empty 
             : data;
     }
 

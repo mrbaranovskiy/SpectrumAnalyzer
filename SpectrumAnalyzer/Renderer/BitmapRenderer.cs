@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using SpectrumAnalyzer.Models;
 
 namespace SpectrumAnalyzer.Renderer;
 
@@ -46,8 +47,8 @@ public abstract class AbstractBitmapRenderer<TData>
     }
 }
 
-public class ComplexDataRenderer(IStreamingDataPool<Complex> dataPool)
-    : AbstractBitmapRenderer<Complex>(dataPool);
+public class ComplexDataRenderer(IStreamingDataPool<ComplexF> dataPool)
+    : AbstractBitmapRenderer<ComplexF>(dataPool);
 
 public class FloatDataRenderer(IStreamingDataPool<float> dataPool)
     : AbstractBitmapRenderer<float>(dataPool);
