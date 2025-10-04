@@ -25,13 +25,20 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="bin\Debug\net8.0\Avalonia.Desktop.dll" />
       <Content Include="bin\Debug\net8.0\Avalonia.Dialogs.dll" />
+      <Content Include="bin\Debug\net8.0\Avalonia.Fonts.Inter.dll" />
+      <Content Include="bin\Debug\net8.0\SpectrumAnalyzer" />
     </ItemGroup>
 
     <ItemGroup>
       <Resource Include="bin\Debug\net8.0\libusrpc.so">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Resource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="bin\Debug\net8.0\libcuda_lib.so" />
     </ItemGroup>
 
 </Project>

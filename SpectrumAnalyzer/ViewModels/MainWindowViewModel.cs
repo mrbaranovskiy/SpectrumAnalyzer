@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using ReactiveUI;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Renderer;
 using SpectrumAnalyzer.Services;
 using SpectrumAnalyzer.Utilities;
@@ -13,12 +13,12 @@ namespace SpectrumAnalyzer.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    private readonly IDeviceConnection<Complex, UsrpConnectionProperties> _usrpConnection;
+    private readonly IDeviceConnection<ComplexF, UsrpConnectionProperties> _usrpConnection;
     private int _samplingRate;
     private int _bandwidth;
     private int _centerFrequency;
-    private IStreamingDataPool<Complex> _streamingPool;
-    private ITransport<Complex> _transport;
+    private IStreamingDataPool<ComplexF> _streamingPool;
+    private ITransport<ComplexF> _transport;
     private ComplexDataRenderer _renderer;
     
     private double _minFrequencyAxis;
@@ -42,7 +42,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private List<IRendererRepresentation<Complex>> _representations;
+    private List<IRendererRepresentation<ComplexF>> _representations;
     
     private FftRepresentation<FFTDrawingProperties> _fftRepresentation;
     private WaterfallRepresentation _waterfallRepresentation;
@@ -57,7 +57,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private double _waterfallCtrlHeight;
     private int _selectedRadio;
 
-    public MainWindowViewModel(IDeviceConnection<Complex, UsrpConnectionProperties> usrpConnection)
+    public MainWindowViewModel(IDeviceConnection<ComplexF, UsrpConnectionProperties> usrpConnection)
     {
         _usrpConnection = usrpConnection;
         _representations = [];
@@ -67,7 +67,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         // obviously - this is trash code.  
         
         _fftProperties = new FFTDrawingProperties(
-            ITransport<Complex>.DefaultChunkSize,
+            ITransport<ComplexF>.DefaultChunkSize,
             100,
             100,
             Bandwidth,
@@ -77,7 +77,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             new AxisRange(CenterFrequency,
                 CenterFrequency + SamplingRate / 2));
 
-        _waterfallDrawingProperties = new WaterfallDrawingProperties(ITransport<Complex>.DefaultChunkSize,
+        _waterfallDrawingProperties = new WaterfallDrawingProperties(ITransport<ComplexF>.DefaultChunkSize,
             100, 100,
             Bandwidth,
             CenterFrequency, SamplingRate,
@@ -128,12 +128,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         if (SelectedRadio == 0)
         {
-            _transport = new FakeTransport(connectionProps, ITransport<Complex>.DefaultChunkSize);
+            _transport = new FakeTransport(connectionProps, ITransport<ComplexF>.DefaultChunkSize);
         }
         else
         {
             _transport = _usrpConnection.BuildConnection(connectionProps);
-            _transport.ReceivingChunkSize = ITransport<Complex>.DefaultChunkSize;
+            _transport.ReceivingChunkSize = SamplingRate / 25;
+            UpdateFftProperties();
+            
         }
             
         _streamingPool = new StreamingIQPool(_transport);
@@ -282,6 +284,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _maxFrequencyAxis = value;
             this.RaiseAndSetIfChanged(ref _maxFrequencyAxis, value);
+            UpdateFftProperties();
         }
     }
 
@@ -292,6 +295,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _minMagnitudeDbAxis = value;
             this.RaiseAndSetIfChanged(ref _minMagnitudeDbAxis, value);
+            UpdateFftProperties();
         }
     }
 
@@ -302,6 +306,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _maxMagnitudeDbAxis = value;
             this.RaiseAndSetIfChanged(ref _maxMagnitudeDbAxis, value);
+            UpdateFftProperties();
         }
     }
 
@@ -309,8 +314,12 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         if (_fftProperties is null)
             _fftProperties = new FFTDrawingProperties(0,0,0,0,0,0, new AxisRange(0,0), new AxisRange());
+
+        int buffLen = _transport?.ReceivingChunkSize ?? ITransport<ComplexF>.DefaultChunkSize;
+        
         _fftProperties = _fftProperties with
         {
+            DataBufferLength = buffLen ,
             Width = (int)FftCtrlWidth,
             Height = (int)FftCtrlHeight,
             Bandwidth = Bandwidth,
@@ -325,6 +334,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         _waterfallDrawingProperties = _waterfallDrawingProperties with
         {
+            DataBufferLength = buffLen ,
             Width = (int)WaterfallCtrlWidth,
             Height = (int)WaterfallCtrlHeight,
             Bandwidth = Bandwidth,

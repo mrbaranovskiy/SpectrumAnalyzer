@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Moq;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Renderer;
 using SpectrumAnalyzer.Services;
 using SpectrumAnalyzer.Services.Native;
@@ -24,7 +25,7 @@ public class StreamingPoolTests
             GainDb = 30,
             SampleRateHz = 10000
         };
-        using ITransport<Complex> transport = new FakeTransport(connectionProps, 1000);
+        using ITransport<ComplexF> transport = new FakeTransport(connectionProps, 1000);
        
         var sdp = new StreamingIQPool(transport);
         var messagesCount = 0;

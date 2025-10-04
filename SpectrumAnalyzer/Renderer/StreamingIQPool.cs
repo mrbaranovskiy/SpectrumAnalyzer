@@ -1,59 +1,67 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Concurrent;
-using System.Numerics;
+using System.Collections.Generic;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Services;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public sealed class StreamingIQPool : IStreamingDataPool<Complex>
+public sealed class StreamingIQPool : IStreamingDataPool<ComplexF>
 {
-    private readonly ITransport<Complex> _transport;
-    private readonly ArrayPool<Complex> _pool;
-    private ulong _chunkId = 0; //forever  and ever.
-    private readonly ConcurrentQueue<Complex[]> _queue;
+    private readonly ITransport<ComplexF> _transport;
+    private readonly ArrayPool<ComplexF> _pool;
+    private readonly ConcurrentQueue<Memory<ComplexF>> _memQueue;
+    private readonly Dictionary<Memory<ComplexF>, ComplexF[]> _memLookup;
 
-    public StreamingIQPool(ITransport<Complex> transport)
+    public StreamingIQPool(ITransport<ComplexF> transport)
     {
-        _pool = ArrayPool<Complex>.Create(1024*1024*10, 1024*10);
+        _pool = ArrayPool<ComplexF>.Create(1024*1024*10, 10);
         _transport = transport;
         _transport.DataReceived += TransportOnDataReceived;
-        _queue = new ConcurrentQueue<Complex[]>();
+        _memQueue = new ConcurrentQueue<Memory<ComplexF>>();
+        _memLookup = new Dictionary<Memory<ComplexF>, ComplexF[]>();
         MaxQueueSize = 10;
     }
 
     private void TransportOnDataReceived(object? sender, EventArgs e)
     {
-        if(_queue.Count >= MaxQueueSize) return;
+        if(_memQueue.Count >= MaxQueueSize) return;
         // delete this bliat`. No sense to read faster in transport than process in
         // Streaming pool. 
         var data = _transport.GetRawData();
         var buffer = _pool.Rent(data.Length);
-        data.CopyTo(buffer);
-        _queue.Enqueue(buffer);
+        var memory = new Memory<ComplexF>(buffer, 0, _transport.ReceivingChunkSize);
+        data.CopyTo(memory.Span);
+        _memLookup[memory] = buffer;
+        _memQueue.Enqueue(memory);
         OnDataReceived(data.Length);
     }
 
-    public bool IsAvailable => !_queue.IsEmpty;
+    public bool IsAvailable => !_memQueue.IsEmpty;
 
     public int RequestLatestDataLength()
     {
         // we can save it before to avoid double enqueuing. 
-        return _queue.TryPeek(out var buffer) ? buffer.Length : 0;
+        return _memQueue.TryPeek(out var buffer) ? buffer.Length : 0;
     }
 
     public int MaxQueueSize { get; set; }
 
-    public bool RequestLatestCopy(Span<Complex> buffer)
+    public bool RequestLatestCopy(Span<ComplexF> buffer)
     {
-        if (!_queue.TryDequeue(out var data))
+        if (!_memQueue.TryDequeue(out var mem))
             return false;
         
-        if(data.Length != buffer.Length)
+        if(mem.Length != buffer.Length)
             throw new InvalidOperationException("Buffers lenghts do not match");
-        data.CopyTo(buffer);
+        mem.Span.CopyTo(buffer);
+
+        if (!_memLookup.TryGetValue(mem, out var value))
+            return false;
         
-        _pool.Return(data, true);
+        _pool.Return(value, true);
+        _memLookup.Remove(mem);
 
         return false;
     }
@@ -62,25 +70,35 @@ public sealed class StreamingIQPool : IStreamingDataPool<Complex>
     /// Peeks but doesnt delete the data from queue.
     /// </summary>
     /// <returns>Returns empty if no data.</returns>
-    public ReadOnlySpan<Complex> PeekLatestData()
+    public ReadOnlySpan<ComplexF> PeekLatestData()
     {
-        return !_queue.TryPeek(out var data) 
-            ? ReadOnlySpan<Complex>.Empty 
-            : data;
+        return !_memQueue.TryPeek(out var data) 
+            ? ReadOnlySpan<ComplexF>.Empty 
+            : data.Span;
     }
 
     public void ReleaseLatestData()
     {
-        if (_queue.TryDequeue(out var buffer))
-            _pool.Return(buffer, true);
+        if (_memQueue.TryDequeue(out var mem))
+        {
+            if (_memLookup.TryGetValue(mem, out var value))
+            {
+                _pool.Return(_memLookup[mem], true);
+                _memLookup.Remove(value);
+            }
+        }
     }
 
     public void Dispose()
     {
-        while (!_queue.IsEmpty)
+        while (!_memQueue.IsEmpty)
         {
-            _queue.TryDequeue(out var data);
-            if (data != null) _pool.Return(data, true);
+            if (!_memQueue.TryDequeue(out var mem))
+                continue;
+            
+            _pool.Return(_memLookup[mem], true);
+            _memLookup.Remove(mem);
+
         }
     }
 

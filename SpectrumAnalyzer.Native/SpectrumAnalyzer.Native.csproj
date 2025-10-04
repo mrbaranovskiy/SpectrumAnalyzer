@@ -4,6 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,6 +15,18 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="CudaMathUtils\cuda_math.cu" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="CudaMathUtils\cuda_math_api.cu" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ClCompile Include="CudaMathUtils\obsolte_cuda_fft.cu" />
     </ItemGroup>
 
 </Project>

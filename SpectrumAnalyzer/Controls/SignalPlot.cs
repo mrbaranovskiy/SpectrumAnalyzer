@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Numerics;
 using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Renderer;
 using Brushes = Avalonia.Media.Brushes;
 using Vector = Avalonia.Vector;
@@ -128,10 +128,10 @@ public class SignalPlot : TemplatedControl
         AvaloniaProperty.Register<SignalPlot, Thickness>(nameof(PlotPadding), new Thickness(32, 16, 16, 28));
     
     
-    public static readonly StyledProperty<IRendererRepresentation<Complex>> RepresentationProperty = AvaloniaProperty.Register<SignalPlot, IRendererRepresentation<Complex>>(
+    public static readonly StyledProperty<IRendererRepresentation<ComplexF>> RepresentationProperty = AvaloniaProperty.Register<SignalPlot, IRendererRepresentation<ComplexF>>(
         nameof(Representation));
 
-    public IRendererRepresentation<Complex> Representation
+    public IRendererRepresentation<ComplexF> Representation
     {
         get => GetValue(RepresentationProperty);
         set => SetValue(RepresentationProperty, value);
@@ -155,7 +155,7 @@ public class SignalPlot : TemplatedControl
     public Thickness PlotPadding { get => GetValue(PlotPaddingProperty); set => SetValue(PlotPaddingProperty, value); }
     public override void Render(DrawingContext context)
     {
-        if(_source is null)
+        if(_source is null || Representation is null)
             return;
      
         UpdateData(Representation.CurrentFrame);

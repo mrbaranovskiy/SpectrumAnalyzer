@@ -30,4 +30,12 @@
     <ItemGroup>
       <ProjectReference Include="..\SpectrumAnalyzer.Native\SpectrumAnalyzer.Native.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="bin\Debug\net8.0\Avalonia.Dialogs.dll" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="bin\Debug\net8.0\libcuda_lib.so" />
+    </ItemGroup>
 </Project>
