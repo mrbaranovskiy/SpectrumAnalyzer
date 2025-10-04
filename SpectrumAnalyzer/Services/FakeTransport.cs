@@ -5,7 +5,7 @@ using SpectrumAnalyzer.Models;
 
 namespace SpectrumAnalyzer.Services;
 
-public class FakeTransport(UsrpConnectionProperties properties, int len) : ITransport<ComplexF>
+public class FakeTransport(SdrConnectionProperties properties, int len) : ITransport<ComplexF>
 {
     private Task _readingTask;
     private CancellationTokenSource _cancellationTokenSource = new();

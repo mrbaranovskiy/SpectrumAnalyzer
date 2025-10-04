@@ -9,7 +9,7 @@ namespace SpectrumAnalyzer.Services;
 public class UsrpTransport : ITransport<ComplexF>
 {
     private readonly IDeviceNativeApi<float> _api;
-    private readonly UsrpConnectionProperties _connectionProps;
+    private readonly SdrConnectionProperties _connectionProps;
     private Task _readTask;
     private readonly CancellationTokenSource _cts = new();
     private Memory<ComplexF> _memoryComplex;
@@ -22,7 +22,7 @@ public class UsrpTransport : ITransport<ComplexF>
 
     public UsrpTransport(
         IDeviceNativeApi<float> api,
-        UsrpConnectionProperties connectionProps)
+        SdrConnectionProperties connectionProps)
     {
         _readTask = Task.CompletedTask;
         _api = api;

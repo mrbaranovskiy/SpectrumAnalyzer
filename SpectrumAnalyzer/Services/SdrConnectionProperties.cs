@@ -1,6 +1,6 @@
 namespace SpectrumAnalyzer.Services;
 
-public record struct UsrpConnectionProperties(
+public record struct SdrConnectionProperties(
     double CenterFrequencyHz,
     double BandwidthHz,
     double GainDb,

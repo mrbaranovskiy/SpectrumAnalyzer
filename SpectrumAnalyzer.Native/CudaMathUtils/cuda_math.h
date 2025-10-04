@@ -33,6 +33,4 @@ extern "C" {
     int iq_power_db_real(const float* in_host, float* out_host, int n, float floor_db);
     // scale to frequncy (this is real)
     int k_scale_r(float* out_host, float N, float Fs);
-
-  
 }

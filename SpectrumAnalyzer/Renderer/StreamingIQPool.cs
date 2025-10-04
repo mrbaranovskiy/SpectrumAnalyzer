@@ -7,14 +7,14 @@ using SpectrumAnalyzer.Services;
 
 namespace SpectrumAnalyzer.Renderer;
 
-public sealed class StreamingIQPool : IStreamingDataPool<ComplexF>
+public sealed class StreamingIqPool : IStreamingDataPool<ComplexF>
 {
     private readonly ITransport<ComplexF> _transport;
     private readonly ArrayPool<ComplexF> _pool;
     private readonly ConcurrentQueue<Memory<ComplexF>> _memQueue;
     private readonly Dictionary<Memory<ComplexF>, ComplexF[]> _memLookup;
 
-    public StreamingIQPool(ITransport<ComplexF> transport)
+    public StreamingIqPool(ITransport<ComplexF> transport)
     {
         _pool = ArrayPool<ComplexF>.Create(1024*1024*10, 10);
         _transport = transport;

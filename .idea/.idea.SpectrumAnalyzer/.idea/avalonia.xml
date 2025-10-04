@@ -4,6 +4,7 @@
     <option name="projectPerEditor">
       <map>
         <entry key="SpectrumAnalyzer/App.axaml" value="SpectrumAnalyzer/SpectrumAnalyzer.csproj" />
+        <entry key="SpectrumAnalyzer/Resources/GenericStyles.axaml" value="SpectrumAnalyzer/SpectrumAnalyzer.csproj" />
         <entry key="SpectrumAnalyzer/Themes/Generic.axaml" value="SpectrumAnalyzer/SpectrumAnalyzer.csproj" />
         <entry key="SpectrumAnalyzer/Views/MainWindow.axaml" value="SpectrumAnalyzer/SpectrumAnalyzer.csproj" />
       </map>

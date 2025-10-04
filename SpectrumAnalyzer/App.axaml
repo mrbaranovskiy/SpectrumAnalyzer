@@ -11,6 +11,7 @@
     </Application.DataTemplates>
   
     <Application.Styles>
+        <StyleInclude Source="Resources/GenericStyles.axaml"></StyleInclude>
         <FluentTheme />
     </Application.Styles>
 </Application>

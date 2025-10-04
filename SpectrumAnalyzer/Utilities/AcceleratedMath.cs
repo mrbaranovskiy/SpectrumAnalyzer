@@ -6,9 +6,7 @@ namespace SpectrumAnalyzer.Utilities;
 
 public static class AcceleratedMath
 {
-    /// <summary>
-    /// FFT forward operation
-    /// </summary>
+    /// <summary> FFT forward operation </summary>
     /// <returns>Return zero if Ok.</returns>
     /// <exception cref="ArgumentException"></exception>
     public static unsafe int FftForward(ReadOnlyMemory<ComplexF> input, Memory<ComplexF> output)

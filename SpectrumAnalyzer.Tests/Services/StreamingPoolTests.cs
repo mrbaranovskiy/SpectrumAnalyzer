@@ -17,7 +17,7 @@ public class StreamingPoolTests
     public async Task TestStreamingDataPool()
     {
         var moq = new Mock<IDeviceNativeApi<float>>();
-        var connectionProps = new UsrpConnectionProperties
+        var connectionProps = new SdrConnectionProperties
         {
             Antenna = "RX2",
             BandwidthHz = 32000,
@@ -27,7 +27,7 @@ public class StreamingPoolTests
         };
         using ITransport<ComplexF> transport = new FakeTransport(connectionProps, 1000);
        
-        var sdp = new StreamingIQPool(transport);
+        var sdp = new StreamingIqPool(transport);
         var messagesCount = 0;
         sdp.DataReceived += (sender, args) =>
         {

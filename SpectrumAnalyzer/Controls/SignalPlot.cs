@@ -99,15 +99,11 @@ public class SignalPlot : TemplatedControl
     public static readonly StyledProperty<double> MaxYProperty =
         AvaloniaProperty.Register<SignalPlot, double>(nameof(MaxY), 1);
 
-    // Grid divisions (count of cells)
-
     public static readonly StyledProperty<int> GridDivisionsXProperty =
         AvaloniaProperty.Register<SignalPlot, int>(nameof(GridDivisionsX), 10);
 
     public static readonly StyledProperty<int> GridDivisionsYProperty =
         AvaloniaProperty.Register<SignalPlot, int>(nameof(GridDivisionsY), 8);
-
-    // Styling knobs for overlay
 
     public static readonly StyledProperty<IBrush> GridBrushProperty =
         AvaloniaProperty.Register<SignalPlot, IBrush>(nameof(GridBrush), Brushes.Gray);

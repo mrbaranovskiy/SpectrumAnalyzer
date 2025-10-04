@@ -7,10 +7,9 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="SpectrumAnalyzer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Name="wnd"
         Icon="/Assets/avalonia-logo.ico"
         Title="SpectrumAnalyzer">
-    
+
     <Window.Styles>
         <Style Selector="global|SignalPlot">
             <Setter Property="Template">
@@ -35,61 +34,81 @@
             </Setter>
         </Style>
     </Window.Styles>
-
+    
+    
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
+    <Grid ShowGridLines="True" x:Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="5*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
 
-    <Grid   VerticalAlignment="Stretch" >
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" ></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="50"></RowDefinition>
-        </Grid.RowDefinitions>
-            <global:SignalPlot Grid.Row="0" x:Name="SignalPlotChart"
-                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                               MinX="{Binding MinFrequencyAxis}"
-                               MaxX="{Binding MaxFrequencyAxis}"
-                               MinY="{Binding MinMagnitudeDbAxis}"
-                               MaxY="{Binding MaxMagnitudeDbAxis}"
-                               Representation="{Binding FftRepresentation}"
-                               GridDivisionsX="10" GridDivisionsY="8"
-                               GridBrush="#404040" AxisBrush="#E0E0E0"
-                               GridThickness="1" AxisThickness="1.5"
-                               PlotPadding="40,16,16,28"
-                               ViewportHeight="{Binding FftCtrlHeight, Mode=OneWayToSource}"
-                               ViewportWidth="{Binding FftCtrlWidth, Mode=OneWayToSource}"
-            />
-     
-            <global:SignalPlot x:Name="WaterflowPlotChart" Grid.Row="1" 
-                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                               MinX="{Binding MinFrequencyAxis}"
-                               MaxX="{Binding MaxFrequencyAxis}"
-                               MinY="{Binding MinMagnitudeDbAxis}"
-                               MaxY="{Binding MaxMagnitudeDbAxis}"
-                               Representation="{Binding WaterfallRepresentation}"
-                               GridDivisionsX="10" GridDivisionsY="8"
-                               GridBrush="#404040" AxisBrush="#E0E0E0"
-                               GridThickness="1" AxisThickness="1.5"
-                               PlotPadding="40,16,16,28"
-                               ViewportHeight="{Binding WaterfallCtrlHeight, Mode=OneWayToSource}"
-                               ViewportWidth="{Binding WaterfallCtrlWidth, Mode=OneWayToSource}"
-            />
-        
-        <StackPanel Margin="10" Orientation="Horizontal" Grid.Row="2">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                <Button Name="StartBtn" Command="{Binding StartReceivingCommand}" Width="80">Start</Button>            
-                <Button Command="{Binding StopReceivingCommand}" Width="80">Stop</Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding SelectedRadio}" IsEnabled="{Binding #StartBtn.IsEnabled}"  ItemsSource="{Binding Radios}"></ComboBox>
-            </StackPanel>
+        <TabControl Margin="5" Grid.Column="1" ItemsSource="{Binding Radios}" >
+            <TabControl.ItemTemplate>
+                <DataTemplate DataType="vm:RadioViewModel">
+                    <TextBlock Text="{Binding Header}"></TextBlock>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
             
-            <!-- <StackPanel  Orientation="Horizontal" VerticalAlignment="Top"> -->
-            <!--     <TextBox Text="{Binding CenterFrequency}"></TextBox> -->
-            <!-- </StackPanel> -->
-         
-        </StackPanel>
-        
+            <!-- <TabItem Header="USRP"> -->
+            <!--     <Grid  VerticalAlignment="Stretch"> -->
+            <!--         <Grid.RowDefinitions> -->
+            <!--             <RowDefinition Height="*"></RowDefinition> -->
+            <!--             <RowDefinition Height="*"></RowDefinition> -->
+            <!--             <RowDefinition Height="50"></RowDefinition> -->
+            <!--         </Grid.RowDefinitions> -->
+            <!--         <global:SignalPlot Grid.Row="0" x:Name="SignalPlotChart" -->
+            <!--                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" -->
+            <!--                            MinX="{Binding MinFrequencyAxis}" -->
+            <!--                            MaxX="{Binding MaxFrequencyAxis}" -->
+            <!--                            MinY="{Binding MinMagnitudeDbAxis}" -->
+            <!--                            MaxY="{Binding MaxMagnitudeDbAxis}" -->
+            <!--                            Representation="{Binding FftRepresentation}" -->
+            <!--                            GridDivisionsX="10" GridDivisionsY="8" -->
+            <!--                            GridBrush="#404040" AxisBrush="#E0E0E0" -->
+            <!--                            GridThickness="1" AxisThickness="1.5" -->
+            <!--                            PlotPadding="40,16,16,28" -->
+            <!--                            ViewportHeight="{Binding FftCtrlHeight, Mode=OneWayToSource}" -->
+            <!--                            ViewportWidth="{Binding FftCtrlWidth, Mode=OneWayToSource}" /> -->
+            <!-- -->
+            <!--         <global:SignalPlot x:Name="WaterflowPlotChart" Grid.Row="1" -->
+            <!--                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" -->
+            <!--                            MinX="{Binding MinFrequencyAxis}" -->
+            <!--                            MaxX="{Binding MaxFrequencyAxis}" -->
+            <!--                            MinY="{Binding MinMagnitudeDbAxis}" -->
+            <!--                            MaxY="{Binding MaxMagnitudeDbAxis}" -->
+            <!--                            Representation="{Binding WaterfallRepresentation}" -->
+            <!--                            GridDivisionsX="10" GridDivisionsY="8" -->
+            <!--                            GridBrush="#404040" AxisBrush="#E0E0E0" -->
+            <!--                            GridThickness="1" AxisThickness="1.5" -->
+            <!--                            PlotPadding="40,16,16,28" -->
+            <!--                            ViewportHeight="{Binding WaterfallCtrlHeight, Mode=OneWayToSource}" -->
+            <!--                            ViewportWidth="{Binding WaterfallCtrlWidth, Mode=OneWayToSource}" /> -->
+            <!-- -->
+            <!--         <StackPanel Margin="10" Orientation="Horizontal" Grid.Row="2"> -->
+            <!--             <StackPanel Orientation="Horizontal" VerticalAlignment="Top"> -->
+            <!--                 <Button Name="StartBtn" Command="{Binding StartReceivingCommand}" Width="80">Start</Button> -->
+            <!--                 <Button Command="{Binding StopReceivingCommand}" Width="80">Stop</Button> -->
+            <!--             </StackPanel> -->
+            <!--             ~1~ <StackPanel Orientation="Horizontal" VerticalAlignment="Top"> @1@ -->
+            <!--             ~1~     <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding SelectedRadio}" @1@ -->
+            <!--             ~1~               IsEnabled="{Binding #StartBtn.IsEnabled}" ItemsSource="{Binding Radios}"> @1@ -->
+            <!--             ~1~     </ComboBox> @1@ -->
+            <!--             ~1~ </StackPanel> @1@ -->
+            <!--            -->
+            <!--             ~1~ <StackPanel  Orientation="Horizontal" VerticalAlignment="Top"> @1@ -->
+            <!--             ~1~     <TextBox Text="{Binding CenterFrequency}"></TextBox> @1@ -->
+            <!--             ~1~ </StackPanel> @1@ -->
+            <!--         </StackPanel> -->
+            <!--     </Grid> -->
+            <!-- </TabItem> -->
+            <!-- -->
+            <!-- -->
+            <!-- <TabItem Header="HackRF"> -->
+            <!--     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="72">HACK RF</TextBlock> -->
+            <!-- </TabItem> -->
+        </TabControl>
     </Grid>
 </Window>

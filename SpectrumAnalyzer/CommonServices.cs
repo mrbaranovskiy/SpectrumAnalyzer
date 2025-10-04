@@ -6,9 +6,9 @@ using SpectrumAnalyzer.ViewModels;
 public static class ServiceCollectionExtensions
 {
     public static void AddCommonServices(this IServiceCollection collection)
-    { IDeviceConnection<ComplexF, UsrpConnectionProperties> props = new UsrpDeviceConnection();
+    { IDeviceConnection<ComplexF, SdrConnectionProperties> props = new UsrpDeviceConnection();
         collection
-            .AddSingleton<IDeviceConnection<ComplexF, UsrpConnectionProperties>, UsrpDeviceConnection>()
+            .AddSingleton<IDeviceConnection<ComplexF, SdrConnectionProperties>, UsrpDeviceConnection>()
             // .AddSingleton<IDeviceNativeApi<float>, UHDApiFake>()    
             // .AddTransient<ITransport<Complex>, UHDTransport>()
             // .AddSingleton<IStreamingDataPool<Complex>, StreamingIQPool>()

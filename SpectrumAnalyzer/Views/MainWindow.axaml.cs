@@ -15,8 +15,8 @@ public partial class MainWindow : Window
         _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(25), DispatcherPriority.Render,
             (_, args) =>
             {
-                WaterflowPlotChart.InvalidateVisual();
-                SignalPlotChart.InvalidateVisual();
+                // WaterflowPlotChart.InvalidateVisual();
+                // SignalPlotChart.InvalidateVisual();
             });
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
@@ -13,7 +14,7 @@ namespace SpectrumAnalyzer.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    private readonly IDeviceConnection<ComplexF, UsrpConnectionProperties> _usrpConnection;
+    private readonly IDeviceConnection<ComplexF, SdrConnectionProperties> _usrpConnection;
     private int _samplingRate;
     private int _bandwidth;
     private int _centerFrequency;
@@ -26,12 +27,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private double _minMagnitudeDbAxis;
     private double _maxMagnitudeDbAxis;
 
-    public List<string> Radios { get; } =
-    [
-        "Fake Radio",
-        "USRP"
-    ];
-
     public int SelectedRadio
     {
         get => _selectedRadio;
@@ -43,7 +38,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     }
 
     private List<IRendererRepresentation<ComplexF>> _representations;
-    
     private FftRepresentation<FFTDrawingProperties> _fftRepresentation;
     private WaterfallRepresentation _waterfallRepresentation;
     
@@ -56,9 +50,15 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private double _waterfallCtrlWidth;
     private double _waterfallCtrlHeight;
     private int _selectedRadio;
+    private readonly ObservableCollection<IRadioViewModel> _radios = new();
 
-    public MainWindowViewModel(IDeviceConnection<ComplexF, UsrpConnectionProperties> usrpConnection)
+    public ObservableCollection<IRadioViewModel> Radios => _radios;
+
+    public MainWindowViewModel(IDeviceConnection<ComplexF, SdrConnectionProperties> usrpConnection)
     {
+        _radios.Add(new RadioViewModel { Header = "USPR" });
+        _radios.Add(new RadioViewModel { Header = "Fake1" });
+        
         _usrpConnection = usrpConnection;
         _representations = [];
         //set some defaults
@@ -117,7 +117,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         
         // it is stupid.... but i have no much time to 
         // implement different devices, device manager and so on..
-        var connectionProps = new UsrpConnectionProperties
+        var connectionProps = new SdrConnectionProperties
         {
             Antenna = "RX2",
             BandwidthHz = Bandwidth,
@@ -138,7 +138,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             
         }
             
-        _streamingPool = new StreamingIQPool(_transport);
+        _streamingPool = new StreamingIqPool(_transport);
         Renderer = new ComplexDataRenderer(_streamingPool);
         
         UpdateFftProperties();
