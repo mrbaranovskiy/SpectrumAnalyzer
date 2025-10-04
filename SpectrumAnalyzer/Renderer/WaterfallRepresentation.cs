@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Media;
-using SpectrumAnalyzer.Models;
 
 namespace SpectrumAnalyzer.Renderer;
 

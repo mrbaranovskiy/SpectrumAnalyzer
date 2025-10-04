@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;

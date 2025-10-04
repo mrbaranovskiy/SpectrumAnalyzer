@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using SpectrumAnalyzer.Models;
+﻿using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Services.Native;
 
 namespace SpectrumAnalyzer.Services;

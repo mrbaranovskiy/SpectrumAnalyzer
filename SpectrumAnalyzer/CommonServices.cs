@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Services;
 using SpectrumAnalyzer.ViewModels;

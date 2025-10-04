@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Buffers;
-using System.Numerics;
 using Avalonia;
 using SpectrumAnalyzer.Utilities;
 using Avalonia.Media;
 using SpectrumAnalyzer.Models;
-using SpectrumAnalyzer.Native;
 
 namespace SpectrumAnalyzer.Renderer;
 

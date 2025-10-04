@@ -2,7 +2,6 @@
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia;
-using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Renderer;

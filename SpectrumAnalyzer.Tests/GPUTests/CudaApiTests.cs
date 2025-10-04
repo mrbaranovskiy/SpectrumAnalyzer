@@ -1,7 +1,5 @@
 using System.Diagnostics;
-using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks.Sources;
 using DynamicData;
 using SpectrumAnalyzer.Native;
 
