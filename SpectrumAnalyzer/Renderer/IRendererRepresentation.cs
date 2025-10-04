@@ -7,7 +7,7 @@ using SpectrumAnalyzer.Utilities;
 namespace SpectrumAnalyzer.Renderer;
 
 // time/fft/waterfall
-public interface IRendererRepresentation<TData> : IDisposable where TData : struct
+public interface IRendererRepresentation<TData, TRenderData> : IDisposable where TData : struct
 {
     /// <summary>
     /// Builds the representation
@@ -15,15 +15,16 @@ public interface IRendererRepresentation<TData> : IDisposable where TData : stru
     /// <param name="span"></param>
     /// <returns></returns>
     void BuildRepresentation(ReadOnlySpan<TData> span);
-    ReadOnlySpan<byte> CurrentFrame { get; }
+    TRenderData CurrentFrame { get; }
     bool Rendered { get; }
 }
 
 
 //todo: handle DrawingProperties change!!!!
-public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
-    : IRendererRepresentation<TData> 
+public abstract class RendererRepresentationAbstract<TDrawingProperties, TData, TRenderData> 
+    : IRendererRepresentation<TData, TRenderData> 
     where TData : struct
+    where TRenderData : struct 
     where TDrawingProperties : IDrawingProperties
 {
     protected BitmapGraphics BitmapGraphics;
@@ -94,7 +95,7 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
     }
 
     public abstract void BuildRepresentation(ReadOnlySpan<TData> data);
-    public abstract ReadOnlySpan<byte> CurrentFrame { get; }
+    public abstract TRenderData CurrentFrame { get; }
     public bool Rendered { get; protected set; }
 
     protected abstract void HandleDrawingPropertiesUpdated();

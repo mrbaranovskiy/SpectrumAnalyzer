@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using ReactiveUI;
 using SpectrumAnalyzer.Models;
@@ -37,7 +38,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private List<IRendererRepresentation<ComplexF>> _representations;
+    private List<IRendererRepresentation<ComplexF, ReadOnlyMemory<byte>>> _representations;
     private FftRepresentation<FFTDrawingProperties> _fftRepresentation;
     private WaterfallRepresentation _waterfallRepresentation;
     
@@ -135,7 +136,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             _transport = _usrpConnection.BuildConnection(connectionProps);
             _transport.ReceivingChunkSize = SamplingRate / 25;
             UpdateFftProperties();
-            
         }
             
         _streamingPool = new StreamingIqPool(_transport);

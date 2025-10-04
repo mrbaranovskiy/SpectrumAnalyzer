@@ -8,7 +8,7 @@ using SpectrumAnalyzer.Models;
 namespace SpectrumAnalyzer.Renderer;
 
 public class FftRepresentation<TDrawingProperties> 
-    : RendererRepresentationAbstract<TDrawingProperties, ComplexF> 
+    : RendererRepresentationAbstract<TDrawingProperties, ComplexF, ReadOnlyMemory<byte>> 
     where TDrawingProperties : IDrawingProperties
 {
     public FftRepresentation(TDrawingProperties properties) 
@@ -79,12 +79,12 @@ public class FftRepresentation<TDrawingProperties>
         BitmapGraphics.DrawLines(BitmapMemoryHandle, generatePoints, Colors.Green);
     }
 
-    public override ReadOnlySpan<byte> CurrentFrame
+    public override ReadOnlyMemory<byte> CurrentFrame
     {
         get
         {
             Rendered = false;
-            return BitmapMemoryHandle.Span;
+            return BitmapMemoryHandle;
         }
     }
 

@@ -124,10 +124,10 @@ public class SignalPlot : TemplatedControl
         AvaloniaProperty.Register<SignalPlot, Thickness>(nameof(PlotPadding), new Thickness(32, 16, 16, 28));
     
     
-    public static readonly StyledProperty<IRendererRepresentation<ComplexF>> RepresentationProperty = AvaloniaProperty.Register<SignalPlot, IRendererRepresentation<ComplexF>>(
-        nameof(Representation));
+    public static readonly StyledProperty<IRendererRepresentation<ComplexF, ReadOnlyMemory<byte>>> RepresentationProperty 
+        = AvaloniaProperty.Register<SignalPlot, IRendererRepresentation<ComplexF, ReadOnlyMemory<byte>>>(nameof(Representation));
 
-    public IRendererRepresentation<ComplexF> Representation
+    public IRendererRepresentation<ComplexF, ReadOnlyMemory<byte>> Representation
     {
         get => GetValue(RepresentationProperty);
         set => SetValue(RepresentationProperty, value);
@@ -154,7 +154,7 @@ public class SignalPlot : TemplatedControl
         if(_source is null || Representation is null)
             return;
      
-        UpdateData(Representation.CurrentFrame);
+        UpdateData(Representation.CurrentFrame.Span);
 
         var src = new Rect(-PlotPadding.Left,  PlotPadding.Bottom, Width - PlotPadding.Right , Height - PlotPadding.Top);
         var dst = new Rect(0,  0, Width  - PlotPadding.Right , Height - PlotPadding.Top);
