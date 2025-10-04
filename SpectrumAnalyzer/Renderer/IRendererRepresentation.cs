@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia;
+using SpectrumAnalyzer.Models;
 using SpectrumAnalyzer.Utilities;
 
 namespace SpectrumAnalyzer.Renderer;
@@ -30,10 +31,10 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
     protected ArrayPool<byte> BitmapPool;
     protected Memory<byte> BitmapMemoryHandle;
     protected Memory<TData> SignalMemoryHandle;
-    protected Memory<TData> PowerMemoryHandle;
+    protected Memory<float> PowerMemoryHandle;
     protected byte[] BitmapBuffer;
     protected TData[] SignalBuffer;
-    protected TData[] PowerBuffer;
+    protected float[] PowerBuffer;
     TDrawingProperties _drawingProperties;
 
     protected RendererRepresentationAbstract([DisallowNull] TDrawingProperties drawingProperties)
@@ -70,14 +71,14 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
 
         if (BitmapBuffer != null) BitmapPool?.Return(BitmapBuffer);
         if (SignalBuffer != null) ArrayPool<TData>.Shared.Return(SignalBuffer);
-        if (PowerBuffer != null) ArrayPool<TData>.Shared.Return(PowerBuffer);
+        if (PowerBuffer != null) ArrayPool<float>.Shared.Return(PowerBuffer);
         
         DrawingProperties = properties;
         
         InitBuffers();
     }
 
-    protected abstract void Draw(Memory<Point> generatePoints, Span<double> magnitudes, Span<double> freqs);
+    protected abstract void Draw(Memory<Point> generatePoints, Span<float> magnitudes, Span<float> freqs);
 
     public virtual void InitBuffers()
     {
@@ -88,9 +89,9 @@ public abstract class RendererRepresentationAbstract<TDrawingProperties, TData>
         BitmapBuffer = BitmapPool.Rent(windowSize);
         BitmapMemoryHandle = new Memory<byte>(BitmapBuffer, 0, windowSize);
         SignalBuffer = ArrayPool<TData>.Shared.Rent(DrawingProperties.DataBufferLength);
-        PowerBuffer = ArrayPool<TData>.Shared.Rent(DrawingProperties.DataBufferLength);
+        PowerBuffer = ArrayPool<float>.Shared.Rent(DrawingProperties.DataBufferLength);
         SignalMemoryHandle = new Memory<TData>(SignalBuffer, 0, DrawingProperties.DataBufferLength);
-        PowerMemoryHandle = new Memory<TData>(SignalBuffer, 0, DrawingProperties.DataBufferLength);
+        PowerMemoryHandle = new Memory<float>(PowerBuffer, 0, DrawingProperties.DataBufferLength);
     }
 
     public abstract void BuildRepresentation(ReadOnlySpan<TData> data);

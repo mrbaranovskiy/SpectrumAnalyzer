@@ -29,14 +29,52 @@ __global__ void k_power(const float* __restrict__ x, float* __restrict__ p, int 
     p[i] = re*re + im*im; // power
 }
 
+// __device__ float abs(float x)
+// {
+//     return x > 0 ? x : -x;
+// }
+
+// __device__ float hypot(float a, float b)
+// {
+//     a = abs(a);
+//     b = abs(b);
+//
+//     float d1;
+//     float d2;
+//
+//     if (a > b)
+//     {
+//         d1 = a;
+//         d2 = b;
+//     }
+//     else
+//     {
+//         d1 = b;
+//         d2 = a;
+//     }
+//
+//     if (d2 == 0.0) return 0;
+//
+//     float num = d1/d2;
+//
+//     return d2 * sqrt(1 + num*num);
+// }
+
+__device__ float magnitude(float im, float real, int len)
+{
+    return 2 * hypot(im, real) / len;
+}
+
 __global__ void k_power_db(const float* __restrict__ x, float* __restrict__ p_db, int n, float floor_db){
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= n) return;
     float re = x[2*i+0];
     float im = x[2*i+1];
-    float pw = re*re + im*im;
+    // float pw = re*re + im*im;
+
+    float pw = magnitude(im, re, n);
     // 10*log10(power). add tiny epsilon; clamp
-    float db = 10.0f * log10f(fmaxf(pw, 1e-30f));
+    float db = 20.0f * log10f(fmaxf(pw, 1e-30f));
     p_db[i] = fmaxf(db, floor_db);
 }
 

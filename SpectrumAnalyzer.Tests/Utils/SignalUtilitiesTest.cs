@@ -9,8 +9,8 @@ public class SignalUtilitiesTest
     [TestMethod]
     public void TestInterpolation()
     {
-        var data = Enumerable.Range(0, 10).Select(s => (double)s).ToArray().AsSpan();
-        var output = new Span<double>(new double[20]);
+        var data = Enumerable.Range(0, 10).Select(s => (float)s).ToArray().AsSpan();
+        var output = new Span<float>(new float[20]);
         SignalDecimation.ResampleData(data, output);
 
 

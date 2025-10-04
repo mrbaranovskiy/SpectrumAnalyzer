@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Media;
+using SpectrumAnalyzer.Models;
 
 namespace SpectrumAnalyzer.Renderer;
 
@@ -34,7 +35,7 @@ public class WaterfallRepresentation : FftRepresentation<WaterfallDrawingPropert
         _cyclicScreenBufferMemory = new Memory<byte>(_cyclicScreenBuffer);
     }
 
-    protected override void Draw(Memory<Point> generatePoints, Span<double> magnitudes, Span<double> freqs)
+    protected override void Draw(Memory<Point> generatePoints, Span<float> magnitudes, Span<float> freqs)
     {
         GeneratePoints(generatePoints.Span, magnitudes, freqs);
 

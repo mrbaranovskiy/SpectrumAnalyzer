@@ -123,7 +123,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             Antenna = "RX2",
             BandwidthHz = Bandwidth,
             CenterFrequencyHz = CenterFrequency,
-            GainDb = 30,
+            GainDb = 50,
             SampleRateHz = SamplingRate
         };
 
@@ -134,7 +134,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         else
         {
             _transport = _usrpConnection.BuildConnection(connectionProps);
-            _transport.ReceivingChunkSize = ITransport<ComplexF>.DefaultChunkSize;
+            _transport.ReceivingChunkSize = SamplingRate / 25;
+            UpdateFftProperties();
+            
         }
             
         _streamingPool = new StreamingIQPool(_transport);
@@ -283,6 +285,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _maxFrequencyAxis = value;
             this.RaiseAndSetIfChanged(ref _maxFrequencyAxis, value);
+            UpdateFftProperties();
         }
     }
 
@@ -293,6 +296,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _minMagnitudeDbAxis = value;
             this.RaiseAndSetIfChanged(ref _minMagnitudeDbAxis, value);
+            UpdateFftProperties();
         }
     }
 
@@ -303,6 +307,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _maxMagnitudeDbAxis = value;
             this.RaiseAndSetIfChanged(ref _maxMagnitudeDbAxis, value);
+            UpdateFftProperties();
         }
     }
 
@@ -310,8 +315,12 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         if (_fftProperties is null)
             _fftProperties = new FFTDrawingProperties(0,0,0,0,0,0, new AxisRange(0,0), new AxisRange());
+
+        int buffLen = _transport?.ReceivingChunkSize ?? ITransport<ComplexF>.DefaultChunkSize;
+        
         _fftProperties = _fftProperties with
         {
+            DataBufferLength = buffLen ,
             Width = (int)FftCtrlWidth,
             Height = (int)FftCtrlHeight,
             Bandwidth = Bandwidth,
@@ -326,6 +335,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         _waterfallDrawingProperties = _waterfallDrawingProperties with
         {
+            DataBufferLength = buffLen ,
             Width = (int)WaterfallCtrlWidth,
             Height = (int)WaterfallCtrlHeight,
             Bandwidth = Bandwidth,
